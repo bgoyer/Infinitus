@@ -1,0 +1,30 @@
+[gd_scene load_steps=4 format=3 uid="uid://hmnsb75rccxe"]
+
+[ext_resource type="Script" path="res://Scripts/Pilot_Types/Player.gd" id="1_uji31"]
+[ext_resource type="Texture2D" uid="uid://c77uejhoy1uwn" path="res://Images/Texture/Backgrounds/Starfields/Starfield 1.png" id="3_jvkos"]
+[ext_resource type="Texture2D" uid="uid://2e008ut7sywi" path="res://Images/Texture/Backgrounds/Purple Nebula/Purple Nebula 1 - 1024x1024.png" id="4_3nalp"]
+
+[node name="Player" type="Node"]
+script = ExtResource("1_uji31")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+zoom = Vector2(0.2, 0.2)
+
+[node name="Background" type="Polygon2D" parent="Camera2D"]
+show_behind_parent = true
+position = Vector2(1.49982, -0.000213623)
+scale = Vector2(1.40552, 0.790527)
+texture = ExtResource("3_jvkos")
+polygon = PackedVector2Array(-2048, 2048, -2048, -2048, 2048, -2048, 2048, 2048)
+uv = PackedVector2Array(0, 4096, 0, 0, 4096, 0, 4096, 4096)
+polygons = [PackedInt32Array(0, 1, 2, 3)]
+
+[node name="Nubula" type="Polygon2D" parent="Camera2D"]
+show_behind_parent = true
+position = Vector2(-2.99976, -0.500031)
+scale = Vector2(5.61914, 3.16309)
+texture = ExtResource("4_3nalp")
+texture_scale = Vector2(0.75, 0.75)
+polygon = PackedVector2Array(-512, 512, -512, -512, 512, -512, 512, 512)
+uv = PackedVector2Array(0, 1024, 0, 0, 1024, 0, 1024, 1024)
+polygons = [PackedInt32Array(0, 1, 2, 3)]

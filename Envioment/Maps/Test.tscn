@@ -1,10 +1,10 @@
 [gd_scene load_steps=3 format=3 uid="uid://dkpttwdi7lqhe"]
 
-[ext_resource type="PackedScene" uid="uid://hmnsb75rccxe" path="res://Scripts/Entities/Player_Pilot.tscn" id="1_fnsft"]
+[ext_resource type="PackedScene" uid="uid://hmnsb75rccxe" path="res://Pilot_Types/Player_Pilot.tscn" id="1_fnsft"]
 [ext_resource type="PackedScene" uid="uid://dhnmap04c534h" path="res://Entities/Ships/Frigates/Sparrow.tscn" id="2_tibu0"]
 
 [node name="Test" type="Node2D"]
 
-[node name="Pilot" parent="." instance=ExtResource("1_fnsft")]
+[node name="Player" parent="." instance=ExtResource("1_fnsft")]
 
-[node name="Sparrow" parent="Pilot" instance=ExtResource("2_tibu0")]
+[node name="Sparrow" parent="Player" instance=ExtResource("2_tibu0")]

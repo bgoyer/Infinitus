@@ -1,5 +1,6 @@
-[gd_scene load_steps=4 format=3 uid="uid://dhnmap04c534h"]
+[gd_scene load_steps=5 format=3 uid="uid://dhnmap04c534h"]
 
+[ext_resource type="Script" path="res://Scripts/Ships/Frigates/sparrow.gd" id="1_hp2ed"]
 [ext_resource type="Texture2D" uid="uid://cbis3s0lgt1bb" path="res://Images/Texture/Ship/sparrow.png" id="1_nsvpc"]
 [ext_resource type="Texture2D" uid="uid://bom23tglrmwdc" path="res://Images/Normal/Ship/sparrow@2x.png" id="2_lxmav"]
 
@@ -8,6 +9,7 @@ diffuse_texture = ExtResource("1_nsvpc")
 normal_texture = ExtResource("2_lxmav")
 
 [node name="Sparrow" type="Node2D"]
+script = ExtResource("1_hp2ed")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = SubResource("CanvasTexture_5m0yt")
