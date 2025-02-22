@@ -6,6 +6,5 @@
 [node name="Test" type="Node2D"]
 
 [node name="Pilot" parent="." instance=ExtResource("1_fnsft")]
-position = Vector2(0, -4.75)
 
 [node name="Sparrow" parent="Pilot" instance=ExtResource("2_tibu0")]
