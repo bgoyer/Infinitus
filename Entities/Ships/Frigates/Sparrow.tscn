@@ -1,0 +1,13 @@
+[gd_scene load_steps=4 format=3 uid="uid://dhnmap04c534h"]
+
+[ext_resource type="Texture2D" uid="uid://cbis3s0lgt1bb" path="res://Images/Texture/Ship/sparrow.png" id="1_nsvpc"]
+[ext_resource type="Texture2D" uid="uid://bom23tglrmwdc" path="res://Images/Normal/Ship/sparrow@2x.png" id="2_lxmav"]
+
+[sub_resource type="CanvasTexture" id="CanvasTexture_5m0yt"]
+diffuse_texture = ExtResource("1_nsvpc")
+normal_texture = ExtResource("2_lxmav")
+
+[node name="Sparrow" type="Node2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = SubResource("CanvasTexture_5m0yt")
