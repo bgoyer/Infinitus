@@ -1,4 +1,4 @@
-extends Node
+extends Node2D
 class_name Pilot
 
 var actions = {
@@ -6,9 +6,3 @@ var actions = {
 	Accelerate = false,
 	Turn_Behind = false
 }
-
-func is_pilot_available() -> bool:
-	if get_node_or_null("Pilot") == null:
-		return false
-	else:
-		return true

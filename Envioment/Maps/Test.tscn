@@ -1,10 +1,30 @@
-[gd_scene load_steps=3 format=3 uid="uid://dkpttwdi7lqhe"]
+[gd_scene load_steps=8 format=3 uid="uid://dkpttwdi7lqhe"]
 
+[ext_resource type="PackedScene" uid="uid://bptcijtpjebdy" path="res://Entities/Planets/Planet 1.tscn" id="1_f5ltm"]
 [ext_resource type="PackedScene" uid="uid://hmnsb75rccxe" path="res://Pilot_Types/Player_Pilot.tscn" id="1_fnsft"]
+[ext_resource type="Script" path="res://Scripts/Map_Base.gd" id="1_uhbnl"]
 [ext_resource type="PackedScene" uid="uid://dhnmap04c534h" path="res://Entities/Ships/Frigates/Sparrow.tscn" id="2_tibu0"]
+[ext_resource type="PackedScene" uid="uid://0ux68lm04ghd" path="res://Entities/Equipment/Small/SmallThruster.tscn" id="3_476ya"]
+[ext_resource type="PackedScene" uid="uid://buhe7l0xjecvv" path="res://Entities/Equipment/Small/SmallTurning.tscn" id="4_abnni"]
+[ext_resource type="PackedScene" uid="uid://b23rdcswl4tdp" path="res://Entities/Stars/Star1.tscn" id="6_a3vqt"]
 
 [node name="Test" type="Node2D"]
+script = ExtResource("1_uhbnl")
 
-[node name="Player" parent="." instance=ExtResource("1_fnsft")]
+[node name="Planet1" parent="." node_paths=PackedStringArray("star") instance=ExtResource("1_f5ltm")]
+position = Vector2(9000, 1234)
+star = NodePath("../Star1")
+gravity_strength = 150.0
+eccentricity = 0.5
+orbit_speed_multiplier = 200.0
 
-[node name="Sparrow" parent="Player" instance=ExtResource("2_tibu0")]
+[node name="Star1" parent="." instance=ExtResource("6_a3vqt")]
+
+[node name="Sparrow" parent="." instance=ExtResource("2_tibu0")]
+position = Vector2(9000, 4500)
+
+[node name="SmallThruster" parent="Sparrow" instance=ExtResource("3_476ya")]
+
+[node name="SmallTurning" parent="Sparrow" instance=ExtResource("4_abnni")]
+
+[node name="Player" parent="Sparrow" instance=ExtResource("1_fnsft")]

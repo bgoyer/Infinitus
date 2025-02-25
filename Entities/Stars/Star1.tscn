@@ -1,0 +1,32 @@
+[gd_scene load_steps=5 format=3 uid="uid://b23rdcswl4tdp"]
+
+[ext_resource type="Texture2D" uid="uid://dxynx1ivlsplc" path="res://Images/Texture/Star/b0@2x.png" id="1_2rmag"]
+[ext_resource type="Script" path="res://Scripts/Celestial Body/Celestial_Body_Base.gd" id="1_d1gic"]
+
+[sub_resource type="CanvasTexture" id="CanvasTexture_ocseo"]
+diffuse_texture = ExtResource("1_2rmag")
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_oaov8"]
+light_mode = 1
+
+[node name="Star1" type="Node2D"]
+scale = Vector2(10, 10)
+script = ExtResource("1_d1gic")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = SubResource("CanvasTexture_ocseo")
+
+[node name="CanvasModulate" type="CanvasModulate" parent="Sprite2D"]
+scale = Vector2(1000, 1000)
+color = Color(0, 0, 0, 1)
+
+[node name="PointLight2D" type="PointLight2D" parent="."]
+material = SubResource("CanvasItemMaterial_oaov8")
+color = Color(0.792157, 0.807843, 0.94902, 1)
+energy = 2.83
+shadow_enabled = true
+shadow_color = Color(0, 0, 0, 1)
+shadow_filter = 1
+shadow_filter_smooth = 29.1
+texture = ExtResource("1_2rmag")
+texture_scale = 50.0

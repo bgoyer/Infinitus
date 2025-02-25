@@ -1,5 +1,5 @@
 extends Equipment
-class_name Thruster
+class_name Turning
 
 var thrust: int
 var drain: int

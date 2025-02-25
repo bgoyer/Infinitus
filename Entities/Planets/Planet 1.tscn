@@ -1,0 +1,26 @@
+[gd_scene load_steps=6 format=3 uid="uid://bptcijtpjebdy"]
+
+[ext_resource type="Script" path="res://Scripts/Celestial Body/With_Orbit/Planet/Red_Dwarf.gd" id="1_83mo6"]
+[ext_resource type="Texture2D" uid="uid://bg1xt0vy83if1" path="res://Images/Texture/Planet/browndwarf-l-rogue.png" id="1_ng0nw"]
+[ext_resource type="Texture2D" uid="uid://bfjhw1rkpoe0v" path="res://Images/Normal/Planet/browndwarf-l-rogue_n.png" id="2_e3pw5"]
+
+[sub_resource type="CanvasTexture" id="CanvasTexture_fx7n4"]
+diffuse_texture = ExtResource("1_ng0nw")
+normal_texture = ExtResource("2_e3pw5")
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_sao0t"]
+radius = 4500.0
+
+[node name="Planet1" type="Node2D"]
+script = ExtResource("1_83mo6")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = SubResource("CanvasTexture_fx7n4")
+
+[node name="CanvasModulate" type="CanvasModulate" parent="Sprite2D"]
+color = Color(0, 0, 0, 1)
+
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("CircleShape2D_sao0t")

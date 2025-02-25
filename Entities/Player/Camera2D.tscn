@@ -1,0 +1,59 @@
+[gd_scene load_steps=8 format=3 uid="uid://vkhxcudl5joq"]
+
+[ext_resource type="Script" path="res://Scripts/Game_Logic/Camera2D.tres.gd" id="1_2hrw8"]
+[ext_resource type="PackedScene" uid="uid://cle0ocgpn28s" path="res://UI/Main.tscn" id="1_i68qq"]
+[ext_resource type="Texture2D" uid="uid://c77uejhoy1uwn" path="res://Images/Texture/Backgrounds/Starfields/Starfield 1.png" id="1_jfehw"]
+[ext_resource type="Texture2D" uid="uid://2e008ut7sywi" path="res://Images/Texture/Backgrounds/Purple Nebula/Purple Nebula 1 - 1024x1024.png" id="2_60e16"]
+[ext_resource type="Texture2D" uid="uid://bvfocig2y0dcc" path="res://Images/Texture/Backgrounds/Dust.png" id="3_pw1by"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_4ihso"]
+light_mode = 1
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_oaov8"]
+light_mode = 1
+
+[node name="Camera2D" type="Camera2D"]
+zoom = Vector2(0.02, 0.02)
+script = ExtResource("1_2hrw8")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Main" parent="CanvasLayer" instance=ExtResource("1_i68qq")]
+
+[node name="Background" type="Polygon2D" parent="."]
+light_mask = 0
+z_index = -100
+y_sort_enabled = true
+material = SubResource("CanvasItemMaterial_4ihso")
+position = Vector2(1.49982, -0.000213623)
+scale = Vector2(50, 28.129)
+texture = ExtResource("1_jfehw")
+texture_scale = Vector2(15, 15)
+polygon = PackedVector2Array(-2048, 2048, -2048, -2048, 2048, -2048, 2048, 2048)
+uv = PackedVector2Array(0, 4096, 0, 0, 4096, 0, 4096, 4096)
+polygons = [PackedInt32Array(0, 1, 2, 3)]
+
+[node name="Nubula" type="Polygon2D" parent="."]
+light_mask = 0
+z_index = -50
+y_sort_enabled = true
+material = SubResource("CanvasItemMaterial_oaov8")
+scale = Vector2(200, 112.584)
+texture = ExtResource("2_60e16")
+texture_scale = Vector2(5, 5)
+polygon = PackedVector2Array(-512, 512, -512, -512, 512, -512, 512, 512)
+uv = PackedVector2Array(0, 1024, 0, 0, 1024, 0, 1024, 1024)
+polygons = [PackedInt32Array(0, 1, 2, 3)]
+
+[node name="Dust" type="Polygon2D" parent="."]
+show_behind_parent = true
+light_mask = 0
+z_index = 4096
+y_sort_enabled = true
+material = SubResource("CanvasItemMaterial_oaov8")
+scale = Vector2(200, 112.584)
+texture = ExtResource("3_pw1by")
+texture_scale = Vector2(20, 20)
+polygon = PackedVector2Array(-512, 512, -512, -512, 512, -512, 512, 512)
+uv = PackedVector2Array(0, 1024, 0, 0, 1024, 0, 1024, 1024)
+polygons = [PackedInt32Array(0, 1, 2, 3)]

@@ -1,15 +1,21 @@
 [gd_scene load_steps=5 format=3 uid="uid://dhnmap04c534h"]
 
-[ext_resource type="Script" path="res://Scripts/Ships/Frigates/sparrow.gd" id="1_hp2ed"]
+[ext_resource type="Script" path="res://Scripts/Ships/Frigates/Sparrow.gd" id="1_hp2ed"]
 [ext_resource type="Texture2D" uid="uid://cbis3s0lgt1bb" path="res://Images/Texture/Ship/sparrow.png" id="1_nsvpc"]
-[ext_resource type="Texture2D" uid="uid://bom23tglrmwdc" path="res://Images/Normal/Ship/sparrow@2x.png" id="2_lxmav"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_42w4b"]
+light_mode = 1
 
 [sub_resource type="CanvasTexture" id="CanvasTexture_5m0yt"]
 diffuse_texture = ExtResource("1_nsvpc")
-normal_texture = ExtResource("2_lxmav")
 
-[node name="Sparrow" type="Node2D"]
+[node name="Sparrow" type="CharacterBody2D"]
 script = ExtResource("1_hp2ed")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+y_sort_enabled = true
+material = SubResource("CanvasItemMaterial_42w4b")
 texture = SubResource("CanvasTexture_5m0yt")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+polygon = PackedVector2Array(-21, -19, -25, -7, -38, -5, -40, -26, -42, -26, -44, -5, -58, -2, -59, -22, -62, -22, -67, 6, -66, 18, -64, 31, -58, 31, -56, 18, -46, 18, -43, 28, -39, 28, -36, 17, -28, 17, -16, 23, -11, 39, -32, 47, -38, 61, -17, 62, -12, 71, -3, 79, 5, 79, 12, 72, 18, 63, 39, 62, 32, 48, 11, 39, 19, 23, 27, 18, 36, 16, 38, 28, 44, 27, 45, 18, 56, 18, 58, 32, 64, 33, 67, 18, 67, 8, 66, -1, 62, -22, 60, -22, 58, -3, 44, -5, 42, -25, 40, -25, 38, -5, 23, -7, 20, -19, 11, -21, 14, -60, 1, -81, -12, -64, -12, -21)

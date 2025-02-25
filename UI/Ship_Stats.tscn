@@ -1,0 +1,30 @@
+[gd_scene load_steps=2 format=3 uid="uid://cpq8uvtkne655"]
+
+[ext_resource type="Texture2D" uid="uid://1ct46ka73w5k" path="res://Images/Texture/UI/status@2x.png" id="1_leki4"]
+
+[node name="ShipStats" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -220.0
+offset_right = 220.0
+offset_bottom = 900.0
+grow_horizontal = 0
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("1_leki4")
+
+[node name="Label" type="Label" parent="TextureRect"]
+layout_mode = 0
+offset_left = 102.0
+offset_top = 20.0
+offset_right = 142.0
+offset_bottom = 43.0
