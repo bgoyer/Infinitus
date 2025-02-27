@@ -30,13 +30,11 @@ var speed: float = 0.0
 var last_position: Vector2 = Vector2.ZERO
 
 # --- Variables for rotation-based orbit ---
-# In a realistic Keplerian ellipse, the star is at one focus.
-# We assume here that the star (focus) is at center (0,0) of our coordinate system.
-# The parametric equations (with focus at the origin) are:
-#   x = A * (cos(angle) - eccentricity)
-#   y = B * sin(angle)
 var center: Vector2 = Vector2.ZERO  # The star's position (focus)
 var angle: float = 0.0              # Current angle along the orbit (in radians)
+
+# Remove debug print statements in production builds
+@export var debug_mode: bool = false
 
 func _ready() -> void:
 	# Set the focus to the star's position (or (0,0) if none is assigned)
@@ -50,56 +48,64 @@ func _ready() -> void:
 		A = r / (1.0 - eccentricity)
 		# And the semi-minor axis is:
 		B = A * sqrt(1.0 - eccentricity * eccentricity)
-		# Set the initial angle to 0 (periapsis). Then the planet's position is:
-		# x = A * (cos(0) - eccentricity) = A * (1 - eccentricity)
-		# y = B * sin(0) = 0
+		# Set the initial angle to 0 (periapsis)
 		angle = 0.0
 		position = center + Vector2(A * (cos(angle) - eccentricity), B * sin(angle))
-		print("Initial ellipse parameters: A=", A, " B=", B, " eccentricity=", eccentricity)
+		if debug_mode:
+			print("Initial ellipse parameters: A=", A, " B=", B, " eccentricity=", eccentricity)
 	else:
-		print("Warning: Distance from center is zero; cannot compute orbit.")
+		push_error("Warning: Distance from center is zero; cannot compute orbit.")
 		
-	$Area2D.connect("body_entered", Callable(self, "on_body_entered"))
-	$Area2D.connect("body_exited", Callable(self, "on_body_exited"))
+	# Connect signals with the newer syntax for Godot 4.x
+	$Area2D.body_entered.connect(_on_body_entered)
+	$Area2D.body_exited.connect(_on_body_exited)
 	gravity_range = $Area2D/CollisionShape2D.shape.radius
 
 func _physics_process(delta: float) -> void:
 	# Update the center in case the star moves.
-	center = star.position if star != null else Vector2.ZERO
+	if star:
+		center = star.position
+	
 	# Update the orbit angle using the orbit_speed_multiplier (in radians per second)
 	angle += orbit_speed_multiplier / 10000 * delta
-	# Update the position along the ellipse with the star at the focus:
-	# x = A*(cos(angle) - eccentricity), y = B*sin(angle)
+	# Update the position along the ellipse with the star at the focus
 	position = center + Vector2(A * (cos(angle) - eccentricity), B * sin(angle))
-	print(position.distance_to(center))
-	# For compatibility with extra gravity functions, compute r and direction.
-	var r: float = position.distance_to(center)
-	var direction: Vector2 = (center - position).normalized()
+	
+	if debug_mode:
+		print(position.distance_to(center))
 	
 	update_speed()
-	gravity_tick(delta)
+	_apply_gravity(delta)
 	time_passed += delta
 
-func on_body_entered(body: Node) -> void:
+func _on_body_entered(body: Node) -> void:
 	if body is PhysicsBody2D:
 		bodies_in_range.append(body)
 
-func on_body_exited(body: Node) -> void:
+func _on_body_exited(body: Node) -> void:
 	if body is PhysicsBody2D:
 		bodies_in_range.erase(body)
 
-func gravity_tick(delta: float) -> void:
+# Renamed for clarity and to follow Godot naming conventions
+func _apply_gravity(delta: float) -> void:
 	for body in bodies_in_range:
-		var body_distance: float = global_position.distance_to(body.global_position)
 		if body is Ship:
 			if body.locked:
-				return
+				continue
+				
+			var body_distance: float = global_position.distance_to(body.global_position)
+			var direction = (global_position - body.global_position)
+			
 			if body_distance > 400:
-				body.velocity += (global_position - body.global_position) * (gravity_strength / 1000) * delta
+				body.velocity += direction * (gravity_strength / 1000) * delta
 			else:
-				body.velocity = (global_position - body.global_position) * (body_distance / (speed / 6)) * delta
+				# Avoid potential division by zero with a small epsilon
+				var speed_factor = max(speed, 0.001) / 6
+				body.velocity = direction * (body_distance / speed_factor) * delta
 
 func update_speed() -> void:
 	if last_position != Vector2.ZERO:
-		speed = ((global_position - last_position).length() + speed) / 2.0
+		# Using a weighted average for smoother speed calculations
+		var current_speed = global_position.distance_to(last_position)
+		speed = (current_speed + speed) / 2.0
 	last_position = global_position

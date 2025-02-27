@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://buhe7l0xjecvv"]
 
-[ext_resource type="Script" path="res://Scripts/Equipment/Turning/Small/Small_Turning.gd" id="1_y7x2d"]
+[ext_resource type="Script" uid="uid://c3fbydpkigykb" path="res://Scripts/Equipment/Turning/Small/Small_Turning.gd" id="1_y7x2d"]
 
 [node name="SmallTurning" type="Node2D"]
 script = ExtResource("1_y7x2d")

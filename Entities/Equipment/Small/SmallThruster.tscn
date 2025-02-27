@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://0ux68lm04ghd"]
 
-[ext_resource type="Script" path="res://Scripts/Equipment/Thruster/Small/Small_Thruster.gd" id="1_ejm6f"]
+[ext_resource type="Script" uid="uid://cykeyujcer64c" path="res://Scripts/Equipment/Thruster/Small/Small_Thruster.gd" id="1_ejm6f"]
 
 [node name="SmallThruster" type="Node2D"]
 script = ExtResource("1_ejm6f")

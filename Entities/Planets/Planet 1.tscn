@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=3 uid="uid://bptcijtpjebdy"]
 
-[ext_resource type="Script" path="res://Scripts/Celestial Body/With_Orbit/Planet/Red_Dwarf.gd" id="1_83mo6"]
+[ext_resource type="Script" uid="uid://bjab63ir13hab" path="res://Scripts/Celestial Body/With_Orbit/Planet/Red_Dwarf.gd" id="1_83mo6"]
 [ext_resource type="Texture2D" uid="uid://bg1xt0vy83if1" path="res://Images/Texture/Planet/browndwarf-l-rogue.png" id="1_ng0nw"]
 [ext_resource type="Texture2D" uid="uid://bfjhw1rkpoe0v" path="res://Images/Normal/Planet/browndwarf-l-rogue_n.png" id="2_e3pw5"]
 

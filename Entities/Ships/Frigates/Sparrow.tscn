@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://dhnmap04c534h"]
 
-[ext_resource type="Script" path="res://Scripts/Ships/Frigates/Sparrow.gd" id="1_hp2ed"]
+[ext_resource type="Script" uid="uid://cyxih312lfh0f" path="res://Scripts/Ships/Frigates/sparrow.gd" id="1_hp2ed"]
 [ext_resource type="Texture2D" uid="uid://cbis3s0lgt1bb" path="res://Images/Texture/Ship/sparrow.png" id="1_nsvpc"]
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_42w4b"]

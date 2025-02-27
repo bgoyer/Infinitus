@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://bjqi5jfx3uqn2"]
 
-[ext_resource type="Script" path="res://Scripts/Game_Logic/Main.gd" id="1_5pvsq"]
+[ext_resource type="Script" uid="uid://bmr2vonakp6pg" path="res://Scripts/Game_Logic/Main.gd" id="1_5pvsq"]
 [ext_resource type="PackedScene" uid="uid://dkpttwdi7lqhe" path="res://Envioment/Maps/Test.tscn" id="1_imfbu"]
 [ext_resource type="PackedScene" uid="uid://vkhxcudl5joq" path="res://Entities/Player/Camera2D.tscn" id="3_eol6p"]
 
