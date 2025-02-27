@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://b23rdcswl4tdp"]
+[gd_scene load_steps=5 format=3 uid="uid://b23rdcswl4tdp"]
 
 [ext_resource type="Script" uid="uid://bn82tt8plhvb7" path="res://Scripts/Celestial Body/Celestial_Body_Base.gd" id="1_d1gic"]
 [ext_resource type="Texture2D" uid="uid://cj0kb2o5rn5kj" path="res://Images/Texture/Star/a0@2x.png" id="2_sv8ai"]
@@ -8,9 +8,6 @@ diffuse_texture = ExtResource("2_sv8ai")
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_oaov8"]
 light_mode = 1
-
-[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_agl67"]
-load_path = "res://.godot/imported/b0@2x.png-3f9f371fb6cebdb0801da2f6bd8b2288.ctex"
 
 [node name="Star1" type="Node2D"]
 scale = Vector2(10, 10)
@@ -31,5 +28,5 @@ shadow_enabled = true
 shadow_color = Color(0, 0, 0, 1)
 shadow_filter = 1
 shadow_filter_smooth = 29.1
-texture = SubResource("CompressedTexture2D_agl67")
+texture = ExtResource("2_sv8ai")
 texture_scale = 50.0
