@@ -23,4 +23,5 @@ color = Color(0, 0, 0, 1)
 [node name="Area2D" type="Area2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+visible = false
 shape = SubResource("CircleShape2D_sao0t")
