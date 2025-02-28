@@ -33,14 +33,41 @@ polygon = PackedVector2Array(-2048, 2048, -2048, -2048, 2048, -2048, 2048, 2048)
 uv = PackedVector2Array(0, 4096, 0, 0, 4096, 0, 4096, 4096)
 polygons = [PackedInt32Array(0, 1, 2, 3)]
 
-[node name="Nubula" type="Polygon2D" parent="."]
+[node name="Nubula_Level_1" type="Polygon2D" parent="."]
 light_mask = 0
 z_index = -50
 y_sort_enabled = true
 material = SubResource("CanvasItemMaterial_oaov8")
 scale = Vector2(200, 112.584)
 texture = ExtResource("2_60e16")
-texture_scale = Vector2(5, 5)
+texture_offset = Vector2(25, 90)
+texture_scale = Vector2(2.5, 2.5)
+polygon = PackedVector2Array(-512, 512, -512, -512, 512, -512, 512, 512)
+uv = PackedVector2Array(0, 1024, 0, 0, 1024, 0, 1024, 1024)
+polygons = [PackedInt32Array(0, 1, 2, 3)]
+
+[node name="Nubula_Level_2" type="Polygon2D" parent="."]
+light_mask = 0
+z_index = -50
+y_sort_enabled = true
+material = SubResource("CanvasItemMaterial_oaov8")
+scale = Vector2(200, 112.584)
+texture = ExtResource("2_60e16")
+texture_offset = Vector2(106, -53)
+texture_scale = Vector2(2.5, 2.5)
+polygon = PackedVector2Array(-512, 512, -512, -512, 512, -512, 512, 512)
+uv = PackedVector2Array(0, 1024, 0, 0, 1024, 0, 1024, 1024)
+polygons = [PackedInt32Array(0, 1, 2, 3)]
+
+[node name="Nubula_Level_3" type="Polygon2D" parent="."]
+light_mask = 0
+z_index = -50
+y_sort_enabled = true
+material = SubResource("CanvasItemMaterial_oaov8")
+scale = Vector2(200, 112.584)
+texture = ExtResource("2_60e16")
+texture_offset = Vector2(-49, 354)
+texture_scale = Vector2(2.5, 2.5)
 polygon = PackedVector2Array(-512, 512, -512, -512, 512, -512, 512, 512)
 uv = PackedVector2Array(0, 1024, 0, 0, 1024, 0, 1024, 1024)
 polygons = [PackedInt32Array(0, 1, 2, 3)]
