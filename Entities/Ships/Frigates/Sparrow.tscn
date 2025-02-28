@@ -11,6 +11,7 @@ diffuse_texture = ExtResource("1_nsvpc")
 
 [node name="Sparrow" type="CharacterBody2D"]
 script = ExtResource("1_hp2ed")
+metadata/_custom_type_script = "uid://cyxih312lfh0f"
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 y_sort_enabled = true

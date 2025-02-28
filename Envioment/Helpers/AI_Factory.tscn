@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://b1tms1gyq4fog"]
+
+[ext_resource type="Script" uid="uid://d3qk0lh658vd4" path="res://Scripts/HelperFunctions/AI_Factory.gd" id="1_6n5g4"]
+
+[node name="AiFactory" type="Node"]
+script = ExtResource("1_6n5g4")
+metadata/_custom_type_script = "uid://d3qk0lh658vd4"

@@ -54,6 +54,11 @@ zoom_out={
 ]
 }
 
+[layer_names]
+
+2d_physics/layer_1="Ships Planets Asteroids"
+2d_physics/layer_2="AI Detection"
+
 [rendering]
 
 textures/canvas_textures/default_texture_repeat=1

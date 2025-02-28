@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3 uid="uid://cbe8r8kpf13t3"]
+
+[ext_resource type="Script" uid="uid://dww8s634qe2ov" path="res://Scripts/Pilot_Types/NPC/Pirate_Pilot.gd" id="1_60ms0"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_eirx6"]
+radius = 1500.0
+
+[node name="PiratePilot" type="Node2D"]
+script = ExtResource("1_60ms0")
+metadata/_custom_type_script = "uid://dww8s634qe2ov"
+
+[node name="Area2D" type="Area2D" parent="."]
+collision_layer = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("CircleShape2D_eirx6")

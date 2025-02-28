@@ -11,6 +11,7 @@ class_name Orbiting_Body
 # Multiplier to control the angular (orbit) speed (radians per second)
 @export var orbit_speed_multiplier: float = 1.0
 
+@export var rotation_speed: float = 0
 # The current velocity (computed via frame-to-frame position difference)
 var velocity: Vector2 = Vector2.ZERO
 # Range for detecting other bodies affected by gravity
@@ -77,6 +78,8 @@ func _physics_process(delta: float) -> void:
 	update_speed()
 	_apply_gravity(delta)
 	time_passed += delta
+	rotate((rotation_speed / 360) * delta)
+
 
 func _on_body_entered(body: Node) -> void:
 	if body is PhysicsBody2D:
@@ -97,7 +100,7 @@ func _apply_gravity(delta: float) -> void:
 			var direction = (global_position - body.global_position)
 			
 			if body_distance > 400:
-				body.velocity += direction * (gravity_strength / 1000) * delta
+				body.velocity += direction * (gravity_strength / 5000) * sqrt(body_distance) * delta
 			else:
 				# Avoid potential division by zero with a small epsilon
 				var speed_factor = max(speed, 0.001) / 6

@@ -10,8 +10,8 @@ diffuse_texture = ExtResource("2_sv8ai")
 light_mode = 1
 
 [node name="Star1" type="Node2D"]
-scale = Vector2(10, 10)
 script = ExtResource("1_d1gic")
+metadata/_custom_type_script = "uid://bn82tt8plhvb7"
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = SubResource("CanvasTexture_ocseo")

@@ -20,10 +20,6 @@ func _ready() -> void:
 	_turning_cached = turning != null
 	
 func _physics_process(delta: float) -> void:
-	# Add velocity dampening when not under thrust to simulate space friction
-	# This helps prevent ships from drifting endlessly at high speeds
-	if not locked and velocity.length() > 0:
-		velocity *= 0.995
 	move_and_slide()
 
 func accelerate(delta: float) -> void:
