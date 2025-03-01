@@ -14,7 +14,7 @@ script = ExtResource("1_uhbnl")
 [node name="Planet1" parent="." node_paths=PackedStringArray("star") instance=ExtResource("1_f5ltm")]
 position = Vector2(9000, 1234)
 star = NodePath("../Star1")
-gravity_strength = 9.8
+gravity_strength = 15.0
 eccentricity = 0.5
 orbit_speed_multiplier = 200.0
 rotation_speed = 60.0
