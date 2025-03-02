@@ -91,7 +91,7 @@ func _change_state(new_state: int) -> void:
 	if new_state != current_state:
 		previous_state = current_state
 		current_state = new_state
-		last_state_change_time = Time.get_ticks_msec() / 1000
+		last_state_change_time = Time.get_ticks_msec()
 		# You could emit a signal here if needed
 		# emit_signal("state_changed", current_state)
 

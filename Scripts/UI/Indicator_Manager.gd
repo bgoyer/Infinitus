@@ -19,11 +19,23 @@ var scan_timer: float = 0.0
 @export var track_celestial_bodies: bool = true
 @export var track_only_meta_tagged: bool = false
 
+# Dictionary to store tracked groups for optimization
+var tracked_groups = {
+	"Ships": [],
+	"CelestialBodies": [],
+	"Tracked": []
+}
+
 func _ready():
 	# Find the player camera
 	camera = find_player_camera()
+	
+	# Connect signals to track when nodes are added/removed from groups
+	get_tree().connect("node_added", Callable(self, "_on_node_added"))
+	get_tree().connect("node_removed", Callable(self, "_on_node_removed"))
+	
 	# Perform initial scan for tracked objects
-	scan_for_tracked_objects()
+	call_deferred("scan_for_tracked_objects")
 
 func _process(delta):
 	# Update scan timer
@@ -37,20 +49,8 @@ func _process(delta):
 
 # Find the player camera in the scene
 func find_player_camera() -> Player_Camera:
-	var main = get_tree().get_root().get_node_or_null("Main")
-	if main and main.has_method("get_camera"):
-		return main.get_camera()
-	
-	# Fallback: search through all nodes
-	var cameras = get_tree().get_nodes_in_group("PlayerCamera")
-	if cameras.size() > 0:
-		return cameras[0]
-	
-	# Another fallback
-	var all_cameras = get_tree().get_nodes_in_group("Camera2D")
-	for cam in all_cameras:
-		if cam is Player_Camera:
-			return cam
+	if get_viewport().get_camera_2d():
+		return get_viewport().get_camera_2d()
 	
 	push_error("IndicatorManager: Could not find Player_Camera")
 	return null
@@ -68,6 +68,7 @@ func scan_for_tracked_objects():
 	# Scan for ships
 	if track_ships:
 		var ships = get_tree().get_nodes_in_group("Ships")
+		tracked_groups["Ships"] = ships
 		for ship in ships:
 			# Skip player's ship
 			if camera.player and camera.player.ship == ship:
@@ -82,6 +83,7 @@ func scan_for_tracked_objects():
 	# Scan for celestial bodies
 	if track_celestial_bodies:
 		var bodies = get_tree().get_nodes_in_group("CelestialBodies")
+		tracked_groups["CelestialBodies"] = bodies
 		for body in bodies:
 			if track_only_meta_tagged:
 				if body.has_meta("Tracked") and body.get_meta("Tracked"):
@@ -91,6 +93,7 @@ func scan_for_tracked_objects():
 	
 	# Scan for any object with "Tracked" metadata
 	var all_nodes = get_tree().get_nodes_in_group("Tracked")
+	tracked_groups["Tracked"] = all_nodes
 	for node in all_nodes:
 		if node is Node2D and not track_nodes.has(node):
 			track_nodes.append(node)
@@ -99,6 +102,15 @@ func scan_for_tracked_objects():
 	for node in track_nodes:
 		if not active_indicators.has(node):
 			create_indicator_for_node(node)
+	
+	# Remove indicators for nodes that are no longer tracked
+	var nodes_to_remove = []
+	for node in active_indicators.keys():
+		if not track_nodes.has(node):
+			nodes_to_remove.append(node)
+	
+	for node in nodes_to_remove:
+		remove_indicator_for_node(node)
 
 # Create a new indicator for a node
 func create_indicator_for_node(node: Node2D):
@@ -124,7 +136,30 @@ func create_indicator_for_node(node: Node2D):
 	if node.has_meta("icon_color"):
 		icon_color = node.get_meta("icon_color")
 	elif node is Ship:
-		icon_color = Color(0.2, 0.6, 1.0) # Blue for ships
+		# Color code different ship types
+		var is_pirate = false
+		var is_police = false
+		var is_trader = false
+		
+		for child in node.get_children():
+			if child is Pirate_Pilot:
+				is_pirate = true
+				break
+			elif child is Police_Pilot:
+				is_police = true
+				break
+			elif child is Trader_Pilot:
+				is_trader = true
+				break
+		
+		if is_pirate:
+			icon_color = Color(1.0, 0.2, 0.2) # Red for pirates
+		elif is_police:
+			icon_color = Color(0.2, 0.2, 1.0) # Blue for police
+		elif is_trader:
+			icon_color = Color(0.2, 1.0, 0.2) # Green for traders
+		else:
+			icon_color = Color(0.2, 0.6, 1.0) # Default blue for other ships
 	elif node is Celestial_Body:
 		icon_color = Color(1.0, 0.7, 0.2) # Orange for celestial bodies
 		
@@ -136,6 +171,12 @@ func create_indicator_for_node(node: Node2D):
 	
 	# Store in our dictionary
 	active_indicators[node] = new_indicator
+
+# Remove an indicator for a node
+func remove_indicator_for_node(node: Node2D):
+	if active_indicators.has(node) and is_instance_valid(active_indicators[node]):
+		active_indicators[node].queue_free()
+	active_indicators.erase(node)
 
 # Remove any indicators whose target nodes no longer exist
 func clean_invalid_indicators():
@@ -149,3 +190,43 @@ func clean_invalid_indicators():
 		if is_instance_valid(active_indicators[node]):
 			active_indicators[node].queue_free()
 		active_indicators.erase(node)
+
+# Handle nodes added to the scene
+func _on_node_added(node: Node):
+	# Only process 2D nodes
+	if not node is Node2D:
+		return
+		
+	# Check if this node should be tracked
+	var should_track = false
+	
+	if node.is_in_group("Ships") and track_ships:
+		if not track_only_meta_tagged or (node.has_meta("Tracked") and node.get_meta("Tracked")):
+			should_track = true
+	
+	if node.is_in_group("CelestialBodies") and track_celestial_bodies:
+		if not track_only_meta_tagged or (node.has_meta("Tracked") and node.get_meta("Tracked")):
+			should_track = true
+	
+	if node.is_in_group("Tracked"):
+		should_track = true
+	
+	# If this node should be tracked and doesn't have an indicator yet, create one
+	if should_track and not active_indicators.has(node):
+		create_indicator_for_node(node)
+
+# Handle nodes removed from the scene
+func _on_node_removed(node: Node):
+	# If this node has an indicator, remove it
+	if active_indicators.has(node):
+		remove_indicator_for_node(node)
+
+# Add a node to tracking manually
+func add_tracked_node(node: Node2D):
+	if not active_indicators.has(node):
+		create_indicator_for_node(node)
+
+# Remove a node from tracking manually
+func remove_tracked_node(node: Node2D):
+	if active_indicators.has(node):
+		remove_indicator_for_node(node)

@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://dkpttwdi7lqhe"]
+[gd_scene load_steps=10 format=3 uid="uid://dkpttwdi7lqhe"]
 
 [ext_resource type="PackedScene" uid="uid://bptcijtpjebdy" path="res://Entities/Planets/Planet 1.tscn" id="1_f5ltm"]
 [ext_resource type="PackedScene" uid="uid://hmnsb75rccxe" path="res://Pilot_Types/Player_Pilot.tscn" id="1_fnsft"]
@@ -7,9 +7,16 @@
 [ext_resource type="PackedScene" uid="uid://0ux68lm04ghd" path="res://Entities/Equipment/Small/SmallThruster.tscn" id="3_476ya"]
 [ext_resource type="PackedScene" uid="uid://buhe7l0xjecvv" path="res://Entities/Equipment/Small/SmallTurning.tscn" id="4_abnni"]
 [ext_resource type="PackedScene" uid="uid://b23rdcswl4tdp" path="res://Entities/Stars/Star1.tscn" id="6_a3vqt"]
+[ext_resource type="Script" uid="uid://b5t8d3kebyjou" path="res://Scripts/UI/Indicator_Manager.gd" id="8_kmseh"]
+[ext_resource type="PackedScene" uid="uid://c8jvr7qnu3xoq" path="res://UI/Object_Indicator.tscn" id="9_hah38"]
 
 [node name="Test" type="Node2D"]
 script = ExtResource("1_uhbnl")
+
+[node name="Indicator_Manager" type="CanvasLayer" parent="."]
+script = ExtResource("8_kmseh")
+indicator_scene = ExtResource("9_hah38")
+metadata/_custom_type_script = "uid://b5t8d3kebyjou"
 
 [node name="Planet1" parent="." node_paths=PackedStringArray("star") instance=ExtResource("1_f5ltm")]
 position = Vector2(9000, 1234)

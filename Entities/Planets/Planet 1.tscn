@@ -1,8 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://bptcijtpjebdy"]
+[gd_scene load_steps=7 format=3 uid="uid://bptcijtpjebdy"]
 
 [ext_resource type="Script" uid="uid://bjab63ir13hab" path="res://Scripts/Celestial Body/With_Orbit/Planet/Red_Dwarf.gd" id="1_83mo6"]
 [ext_resource type="Texture2D" uid="uid://bg1xt0vy83if1" path="res://Images/Texture/Planet/browndwarf-l-rogue.png" id="1_ng0nw"]
 [ext_resource type="Texture2D" uid="uid://bfjhw1rkpoe0v" path="res://Images/Normal/Planet/browndwarf-l-rogue_n.png" id="2_e3pw5"]
+[ext_resource type="Script" uid="uid://44dhflug6701" path="res://Scripts/HelperFunctions/Tracked_Object.gd" id="4_6u06a"]
 
 [sub_resource type="CanvasTexture" id="CanvasTexture_fx7n4"]
 diffuse_texture = ExtResource("1_ng0nw")
@@ -26,3 +27,7 @@ color = Color(0, 0, 0, 1)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 visible = false
 shape = SubResource("CircleShape2D_sao0t")
+
+[node name="Tracked_Object" type="Node" parent="."]
+script = ExtResource("4_6u06a")
+metadata/_custom_type_script = "uid://44dhflug6701"

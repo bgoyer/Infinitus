@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://b23rdcswl4tdp"]
+[gd_scene load_steps=6 format=3 uid="uid://b23rdcswl4tdp"]
 
 [ext_resource type="Script" uid="uid://bn82tt8plhvb7" path="res://Scripts/Celestial Body/Celestial_Body_Base.gd" id="1_d1gic"]
 [ext_resource type="Texture2D" uid="uid://cj0kb2o5rn5kj" path="res://Images/Texture/Star/a0@2x.png" id="2_sv8ai"]
+[ext_resource type="Script" uid="uid://44dhflug6701" path="res://Scripts/HelperFunctions/Tracked_Object.gd" id="3_agl67"]
 
 [sub_resource type="CanvasTexture" id="CanvasTexture_ocseo"]
 diffuse_texture = ExtResource("2_sv8ai")
@@ -30,3 +31,7 @@ shadow_filter = 1
 shadow_filter_smooth = 29.1
 texture = ExtResource("2_sv8ai")
 texture_scale = 50.0
+
+[node name="Tracked_Object" type="Node" parent="."]
+script = ExtResource("3_agl67")
+metadata/_custom_type_script = "uid://44dhflug6701"
