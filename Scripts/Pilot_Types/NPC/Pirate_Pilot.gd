@@ -1,11 +1,11 @@
-extends AI_Pilot
-class_name Pirate_Pilot
+extends AIPilot
+class_name PiratePilot
 
 # Pirate-specific variables
 var loot_value: int = 0  # Value of accumulated loot
 var max_loot_capacity: int = 1000  # Maximum loot before returning to base
 var has_pirate_base: bool = false  # Whether this pirate has a base to return to
-var pirate_base: Orbiting_Body = null  # Planet serving as pirate base
+var pirate_base: OrbitingBody = null  # Planet serving as pirate base
 var ambush_position: Vector2 = Vector2.ZERO  # Position to set up ambush
 var is_setting_ambush: bool = false
 var ambush_timer: float = 0.0
@@ -202,7 +202,7 @@ func _evaluate_potential_targets() -> void:
 		# Skip pirate ships
 		var is_pirate = false
 		for child in ship_node.get_children():
-			if child is Pirate_Pilot:
+			if child is PiratePilot:
 				is_pirate = true
 				break
 		
@@ -222,7 +222,7 @@ func _evaluate_potential_targets() -> void:
 		
 		# Trader ships are valued higher
 		for child in ship_node.get_children():
-			if child is Trader_Pilot:
+			if child is TraderPilot:
 				value_score = 0.8
 				break
 		
@@ -231,7 +231,7 @@ func _evaluate_potential_targets() -> void:
 		
 		# Police ships are stronger
 		for child in ship_node.get_children():
-			if child is Police_Pilot:
+			if child is PolicePilot:
 				strength_score = 0.8
 				break
 		
@@ -318,7 +318,7 @@ func _process_attack_state(delta: float) -> void:
 		
 		# More loot from traders
 		for child in target.get_children():
-			if child is Trader_Pilot:
+			if child is TraderPilot:
 				loot = 500
 				break
 		

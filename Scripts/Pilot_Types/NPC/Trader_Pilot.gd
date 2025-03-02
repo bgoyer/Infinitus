@@ -1,9 +1,9 @@
-extends AI_Pilot
-class_name Trader_Pilot
+extends AIPilot
+class_name TraderPilot
 
 # Trader-specific variables
-var target_planet: Orbiting_Body = null  # Planet we want to trade with
-var trade_route: Array[Orbiting_Body] = []  # List of planets in trade route
+var target_planet: OrbitingBody = null  # Planet we want to trade with
+var trade_route: Array[OrbitingBody] = []  # List of planets in trade route
 var current_route_index: int = 0
 var docked: bool = false
 var docking_time: float = 0.0
@@ -115,7 +115,7 @@ func _find_nearest_planet() -> void:
 		# This would be replaced with a more efficient planet registry system
 		var planets = get_tree().get_nodes_in_group("planets")
 		for planet in planets:
-			if planet is Orbiting_Body:
+			if planet is OrbitingBody:
 				var dist = global_position.distance_to(planet.global_position)
 				if dist < nearest_dist:
 					nearest_dist = dist
@@ -151,7 +151,7 @@ func _find_nearest_threat() -> Ship:
 		
 		# Check pilot type (simplified)
 		for child in ship_node.get_children():
-			if child is Player or child is Pirate_Pilot:
+			if child is Player or child is PiratePilot:
 				is_threat = true
 				break
 		
@@ -173,7 +173,7 @@ func _on_body_entered(body: Node) -> void:
 	super._on_body_entered(body)
 	
 	# Trader-specific handling
-	if body is Orbiting_Body:
+	if body is OrbitingBody:
 		# If we have no target planet, consider this one
 		if not target_planet:
 			target_planet = body

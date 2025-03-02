@@ -1,2 +1,2 @@
-extends Orbiting_Body
+extends OrbitingBody
 class_name Red_Dwarf

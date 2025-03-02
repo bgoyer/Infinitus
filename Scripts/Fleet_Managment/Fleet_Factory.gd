@@ -110,16 +110,16 @@ static func _create_ship(ship_scene: PackedScene = null, pilot_type: String = ""
 	# Add appropriate pilot
 	match pilot_type:
 		"trader":
-			var trader_pilot = Trader_Pilot.new()
+			var trader_pilot = TraderPilot.new()
 			ship.add_child(trader_pilot)
 		"pirate":
-			var pirate_pilot = Pirate_Pilot.new()
+			var pirate_pilot = PiratePilot.new()
 			ship.add_child(pirate_pilot)
 		"police":
-			var police_pilot = Police_Pilot.new()
+			var police_pilot = PolicePilot.new()
 			ship.add_child(police_pilot)
 		"escort":
-			var escort_pilot = AI_Pilot.new()
+			var escort_pilot = AIPilot.new()
 			escort_pilot.aggressiveness = 0.6
 			ship.add_child(escort_pilot)
 		"player":
@@ -135,12 +135,12 @@ static func _create_ship(ship_scene: PackedScene = null, pilot_type: String = ""
 static func _ensure_ship_has_equipment(ship: Ship) -> void:
 	# Check if ship has thruster
 	if not ship.is_thruster_installed():
-		var thruster = Small_Thruster.new()
+		var thruster = SmallThruster.new()
 		ship.add_child(thruster)
 	
 	# Check if ship has turning
 	if not ship.is_turning_installed():
-		var turning = Small_Turning.new()
+		var turning = SmallTurning.new()
 		ship.add_child(turning)
 
 # Find the player ship in the scene

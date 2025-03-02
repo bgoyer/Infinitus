@@ -1,2 +1,2 @@
 extends Node2D
-class_name Celestial_Body
+class_name CelestialBody

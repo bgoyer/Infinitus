@@ -1,5 +1,5 @@
 extends Thruster
-class_name Small_Thruster
+class_name SmallThruster
 
 func _init() -> void:
 	description = "A small thruster. Typically used in frigates and destroyers"

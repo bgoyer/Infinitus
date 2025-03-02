@@ -1,5 +1,5 @@
-extends AI_Pilot
-class_name Police_Pilot
+extends AIPilot
+class_name PolicePilot
 
 # Police-specific variables
 var patrol_radius: float = 5000.0  # Radius around center to patrol
@@ -136,7 +136,7 @@ func _scan_for_threats() -> void:
 		# Check if ship is a pirate
 		var is_pirate = false
 		for child in ship_node.get_children():
-			if child is Pirate_Pilot:
+			if child is PiratePilot:
 				is_pirate = true
 				break
 		
@@ -186,7 +186,7 @@ func _find_nearest_planet() -> void:
 		# This would be replaced with a more efficient planet registry system
 		var planets = get_tree().get_nodes_in_group("planets")
 		for planet in planets:
-			if planet is Orbiting_Body:
+			if planet is OrbitingBody:
 				var dist = global_position.distance_to(planet.global_position)
 				if dist < nearest_dist:
 					nearest_dist = dist

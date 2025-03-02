@@ -1,6 +1,6 @@
 extends Node2D
 
-var camera: Player_Camera
+var camera: PlayerCamera
 
 func _ready() -> void:
 	camera = get_camera()
@@ -9,9 +9,9 @@ func _ready() -> void:
 func load_scene() -> void:
 	camera.set_player(get_player())
 
-func get_camera() -> Player_Camera:
+func get_camera() -> PlayerCamera:
 		for child in get_children():
-			if child is Player_Camera:
+			if child is PlayerCamera:
 				return child
 		return null
 		

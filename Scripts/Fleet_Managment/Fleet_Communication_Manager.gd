@@ -138,26 +138,26 @@ func _alert_fleet_members(fleet: Fleet, target: Ship, alerting_ship: Ship) -> vo
 	for ship in fleet.member_ships:
 		if ship != alerting_ship and ship.pilot:
 			# Set the target for all ship pilots
-			if ship.pilot is AI_Pilot:
+			if ship.pilot is AIPilot:
 				# Different pilots might respond differently based on their type
 				if target != null and is_instance_valid(target):
 					# Determine response based on pilot type and distance
 					var distance = ship.global_position.distance_to(target.global_position)
 					
-					if ship.pilot is Police_Pilot:
+					if ship.pilot is PolicePilot:
 						if distance < 1500:  # Within reasonable response range
 							ship.pilot.target = target
-							ship.pilot._change_state(AI_Pilot.State.CHASE)
-					elif ship.pilot is Pirate_Pilot:
+							ship.pilot._change_state(AIPilot.State.CHASE)
+					elif ship.pilot is PiratePilot:
 						if distance < 1200:  # Pirates slightly less coordinated
 							ship.pilot.target = target
-							ship.pilot._change_state(AI_Pilot.State.CHASE)
-					elif ship.pilot is Trader_Pilot:
+							ship.pilot._change_state(AIPilot.State.CHASE)
+					elif ship.pilot is TraderPilot:
 						# Traders will only respond if really close or if it's the flagship calling
 						if distance < 800 or alerting_ship == fleet.flagship:
 							ship.pilot.target = target
 							# Traders prefer to flee rather than engage
-							ship.pilot._change_state(AI_Pilot.State.FLEE)
+							ship.pilot._change_state(AIPilot.State.FLEE)
 
 func _dispatch_assistance(fleet: Fleet, ship_in_need: Ship, assistance_data) -> void:
 	# Find nearby ships that can help
@@ -177,19 +177,19 @@ func _dispatch_assistance(fleet: Fleet, ship_in_need: Ship, assistance_data) -> 
 	var ships_to_dispatch = min(2, nearby_ships.size())
 	for i in range(ships_to_dispatch):
 		var ship = nearby_ships[i].ship
-		if ship.pilot and ship.pilot is AI_Pilot:
+		if ship.pilot and ship.pilot is AIPilot:
 			# Set ship to assist
 			ship.pilot.set_meta("assisting", ship_in_need)
 			
 			# If there's an attacker, target it
 			if assistance_data.has("attacker") and is_instance_valid(assistance_data.attacker):
 				ship.pilot.target = assistance_data.attacker
-				ship.pilot._change_state(AI_Pilot.State.CHASE)
+				ship.pilot._change_state(AIPilot.State.CHASE)
 			else:
 				# Just move to the ship's position
 				var approach_position = ship_in_need.global_position
 				ship.set_meta("approach_position", approach_position)
-				ship.pilot._change_state(AI_Pilot.State.PATROL)  # Will patrol to position
+				ship.pilot._change_state(AIPilot.State.PATROL)  # Will patrol to position
 
 static func _sort_by_distance(a, b) -> bool:
 	return a.distance < b.distance
@@ -236,6 +236,6 @@ func coordinate_attack(fleet: Fleet, target: Ship) -> void:
 		
 		# Tell ship to attack
 		var pilot = ship.pilot
-		if pilot and pilot is AI_Pilot:
+		if pilot and pilot is AIPilot:
 			pilot.target = target
-			pilot._change_state(AI_Pilot.State.ATTACK)
+			pilot._change_state(AIPilot.State.ATTACK)

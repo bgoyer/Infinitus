@@ -12,7 +12,7 @@ var last_assessment_time: float = 0.0
 var assessment_interval: float = 2.0  # How often to make decisions
 var loot_value: int = 0  # Accumulated loot
 var max_loot_capacity: int = 3000  # When to return to base
-var pirate_base: Orbiting_Body = null
+var pirate_base: OrbitingBody = null
 var has_base: bool = false
 var boldness: float = 0.5  # Affects willingness to engage larger targets
 var patience: float = 0.5  # Affects ambush behavior
@@ -198,7 +198,7 @@ func _evaluate_potential_targets() -> void:
 		# Skip other pirate ships
 		var is_pirate = false
 		for child in potential_target.get_children():
-			if child is Pirate_Pilot:
+			if child is PiratePilot:
 				is_pirate = true
 				break
 		
@@ -224,7 +224,7 @@ func _evaluate_potential_targets() -> void:
 		
 		# Trader ships are valued higher
 		for child in potential_target.get_children():
-			if child is Trader_Pilot:
+			if child is TraderPilot:
 				value_score = 0.8
 				break
 		
@@ -233,7 +233,7 @@ func _evaluate_potential_targets() -> void:
 		
 		# Police ships are stronger
 		for child in potential_target.get_children():
-			if child is Police_Pilot:
+			if child is PolicePilot:
 				strength_score = 0.8
 				break
 		
@@ -370,7 +370,7 @@ func _find_nearby_threats() -> Array:
 		
 		# Check if ship is a threat (police or player)
 		for child in ship.get_children():
-			if child is Police_Pilot or child is Player:
+			if child is PolicePilot or child is Player:
 				threats.append(ship)
 				break
 	

@@ -1,5 +1,5 @@
 extends Turning
-class_name Small_Turning
+class_name SmallTurning
 
 func _init() -> void:
 	description = "A small thruster. Typically used in frigates and destroyers"

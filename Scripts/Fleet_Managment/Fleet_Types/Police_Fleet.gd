@@ -14,7 +14,7 @@ var response_target: Ship = null
 var scan_interval: float = 5.0
 var last_scan_time: float = 0.0
 var aggressiveness: float = 0.7  # How eagerly police engage
-var station: Orbiting_Body = null
+var station: OrbitingBody = null
 var has_station: bool = false
 
 func _init(target_fleet: Fleet) -> void:
@@ -230,7 +230,7 @@ func _scan_for_violators() -> void:
 		
 		# Check if ship is a pirate
 		for child in ship.get_children():
-			if child is Pirate_Pilot:
+			if child is PiratePilot:
 				pirates_detected.append(ship)
 				break
 	
@@ -272,7 +272,7 @@ func _is_police_business(ship: Ship) -> bool:
 	
 	# Check if ship is a pirate
 	for child in ship.get_children():
-		if child is Pirate_Pilot:
+		if child is PiratePilot:
 			return true
 	
 	# Other criteria could be added here
@@ -299,7 +299,7 @@ func _assess_sector_threat_level() -> float:
 			continue
 		
 		for child in ship.get_children():
-			if child is Pirate_Pilot:
+			if child is PiratePilot:
 				pirates_in_range += 1
 				break
 	

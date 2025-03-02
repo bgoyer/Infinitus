@@ -48,24 +48,24 @@ func update_status() -> void:
 	var pilot = ship.pilot
 	
 	if pilot:
-		if pilot is AI_Pilot:
+		if pilot is AIPilot:
 			# Get AI state
 			match pilot.current_state:
-				AI_Pilot.State.IDLE:
+				AIPilot.State.IDLE:
 					status_text = "Idle"
-				AI_Pilot.State.PATROL:
+				AIPilot.State.PATROL:
 					status_text = "Patrolling"
-				AI_Pilot.State.CHASE:
+				AIPilot.State.CHASE:
 					status_text = "Pursuing"
-				AI_Pilot.State.ATTACK:
+				AIPilot.State.ATTACK:
 					status_text = "Attacking"
-				AI_Pilot.State.FLEE:
+				AIPilot.State.FLEE:
 					status_text = "Fleeing"
-				AI_Pilot.State.LAND:
+				AIPilot.State.LAND:
 					status_text = "Landing"
-				AI_Pilot.State.WARP_IN:
+				AIPilot.State.WARP_IN:
 					status_text = "Warping In"
-				AI_Pilot.State.WARP_OUT:
+				AIPilot.State.WARP_OUT:
 					status_text = "Warping Out"
 		elif pilot is Player:
 			status_text = "Player Controlled"

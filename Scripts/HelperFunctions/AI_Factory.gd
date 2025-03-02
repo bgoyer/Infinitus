@@ -1,5 +1,5 @@
 extends Node
-class_name AI_Factory
+class_name AIFactory
 
 # Enums for AI types
 enum AI_Type {TRADER, POLICE, PIRATE}
@@ -136,7 +136,7 @@ func _create_pilot(ai_type: int) -> Pilot:
 	
 	return null
 
-func _setup_trader_pilot(pilot: Trader_Pilot) -> void:
+func _setup_trader_pilot(pilot: TraderPilot) -> void:
 	# Set up trade route with random planets
 	if planets.size() > 0:
 		var route_length = randi_range(2, min(4, planets.size()))
@@ -150,7 +150,7 @@ func _setup_trader_pilot(pilot: Trader_Pilot) -> void:
 		pilot.target_planet = pilot.trade_route[0]
 		pilot.patrol_points = [pilot.target_planet.global_position]
 
-func _setup_police_pilot(pilot: Police_Pilot) -> void:
+func _setup_police_pilot(pilot: PolicePilot) -> void:
 	# Set patrol center to a random planet if available
 	if planets.size() > 0:
 		var center_planet = planets[randi() % planets.size()]
@@ -162,7 +162,7 @@ func _setup_police_pilot(pilot: Police_Pilot) -> void:
 	pilot.patrol_seed = randi()
 	pilot._generate_patrol_points()
 
-func _setup_pirate_pilot(pilot: Pirate_Pilot) -> void:
+func _setup_pirate_pilot(pilot: PiratePilot) -> void:
 	# 50% chance to have a pirate base
 	pilot.has_pirate_base = randf() < 0.5
 	

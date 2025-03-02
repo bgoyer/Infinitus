@@ -1,8 +1,8 @@
 extends CanvasLayer
-class_name Indicator_Manager
+class_name IndicatorManager
 
 # Reference to the camera following the player
-var camera: Player_Camera
+var camera: PlayerCamera
 # Dictionary to store all active indicators by target node
 var active_indicators = {}
 # Preload the indicator scene
@@ -48,7 +48,7 @@ func _process(delta):
 	clean_invalid_indicators()
 
 # Find the player camera in the scene
-func find_player_camera() -> Player_Camera:
+func find_player_camera() -> PlayerCamera:
 	if get_viewport().get_camera_2d():
 		return get_viewport().get_camera_2d()
 	
@@ -130,7 +130,7 @@ func create_indicator_for_node(node: Node2D):
 		icon_texture = node.get_meta("icon_texture")
 	elif node is Ship:
 		icon_texture = default_icon_texture # Use ship icon
-	elif node is Celestial_Body:
+	elif node is CelestialBody:
 		icon_texture = default_icon_texture # Use planet icon
 		
 	if node.has_meta("icon_color"):
@@ -142,13 +142,13 @@ func create_indicator_for_node(node: Node2D):
 		var is_trader = false
 		
 		for child in node.get_children():
-			if child is Pirate_Pilot:
+			if child is PiratePilot:
 				is_pirate = true
 				break
-			elif child is Police_Pilot:
+			elif child is PolicePilot:
 				is_police = true
 				break
-			elif child is Trader_Pilot:
+			elif child is TraderPilot:
 				is_trader = true
 				break
 		
@@ -160,7 +160,7 @@ func create_indicator_for_node(node: Node2D):
 			icon_color = Color(0.2, 1.0, 0.2) # Green for traders
 		else:
 			icon_color = Color(0.2, 0.6, 1.0) # Default blue for other ships
-	elif node is Celestial_Body:
+	elif node is CelestialBody:
 		icon_color = Color(1.0, 0.7, 0.2) # Orange for celestial bodies
 		
 	if node.has_meta("show_distance"):

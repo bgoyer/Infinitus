@@ -1,5 +1,5 @@
 extends Camera2D
-class_name Player_Camera
+class_name PlayerCamera
 
 var player
 var background: Polygon2D

@@ -1,5 +1,5 @@
 extends Node
-class_name Tracked_Object
+class_name TrackedObject
 
 # This is a helper mixin script you can add to any objects you want tracked
 

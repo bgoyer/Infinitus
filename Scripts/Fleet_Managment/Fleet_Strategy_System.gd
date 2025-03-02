@@ -131,8 +131,8 @@ func handle_member_low_health(fleet: Fleet, damaged_ship: Ship, health_data) -> 
 	else:
 		# Regular member with low health
 		# Allow it to retreat individually
-		if damaged_ship.pilot and damaged_ship.pilot is AI_Pilot:
-			damaged_ship.pilot._change_state(AI_Pilot.State.FLEE)
+		if damaged_ship.pilot and damaged_ship.pilot is AIPilot:
+			damaged_ship.pilot._change_state(AIPilot.State.FLEE)
 
 func handle_target_acquired(fleet: Fleet, ship: Ship, target_data) -> void:
 	# Fleet member has acquired a target
@@ -277,9 +277,9 @@ func _execute_attack_command(fleet: Fleet, target) -> void:
 	# Assign target to all ships in fleet
 	for ship in fleet.member_ships:
 		var pilot = ship.pilot
-		if pilot and pilot is AI_Pilot:
+		if pilot and pilot is AIPilot:
 			pilot.target = target
-			pilot._change_state(AI_Pilot.State.CHASE)
+			pilot._change_state(AIPilot.State.CHASE)
 
 func _execute_defend_command(fleet: Fleet, target = null) -> void:
 	# If no specific target, defend the flagship
@@ -297,7 +297,7 @@ func _execute_defend_command(fleet: Fleet, target = null) -> void:
 			continue
 		
 		var pilot = ship.pilot
-		if pilot and pilot is AI_Pilot:
+		if pilot and pilot is AIPilot:
 			# Calculate position in the circle
 			var angle = 2 * PI * i / ship_count
 			var defend_radius = 300.0
@@ -309,16 +309,16 @@ func _execute_defend_command(fleet: Fleet, target = null) -> void:
 			# Set the ship to patrol around this position
 			pilot.patrol_points = [target.global_position + defend_pos]
 			pilot.current_patrol_index = 0
-			pilot._change_state(AI_Pilot.State.PATROL)
+			pilot._change_state(AIPilot.State.PATROL)
 
 func _execute_move_to_command(fleet: Fleet, position: Vector2) -> void:
 	# Move the entire fleet to a position
 	
 	# First, have the flagship move to the position
-	if fleet.flagship and fleet.flagship.pilot and fleet.flagship.pilot is AI_Pilot:
+	if fleet.flagship and fleet.flagship.pilot and fleet.flagship.pilot is AIPilot:
 		fleet.flagship.pilot.patrol_points = [position]
 		fleet.flagship.pilot.current_patrol_index = 0
-		fleet.flagship.pilot._change_state(AI_Pilot.State.PATROL)
+		fleet.flagship.pilot._change_state(AIPilot.State.PATROL)
 	
 	# The rest of the fleet will follow in formation automatically
 
@@ -328,7 +328,7 @@ func _execute_scatter_command(fleet: Fleet) -> void:
 	
 	for ship in fleet.member_ships:
 		var pilot = ship.pilot
-		if pilot and pilot is AI_Pilot:
+		if pilot and pilot is AIPilot:
 			# Calculate a random direction away from center
 			var scatter_angle = randf_range(0, 2 * PI)
 			var scatter_distance = randf_range(800, 1500)
@@ -337,7 +337,7 @@ func _execute_scatter_command(fleet: Fleet) -> void:
 			# Set the ship to move to this position
 			pilot.patrol_points = [scatter_pos]
 			pilot.current_patrol_index = 0
-			pilot._change_state(AI_Pilot.State.PATROL)
+			pilot._change_state(AIPilot.State.PATROL)
 
 func _execute_retreat_command(fleet: Fleet, retreat_position = null) -> void:
 	# Retreat the entire fleet
@@ -368,10 +368,10 @@ func _execute_retreat_command(fleet: Fleet, retreat_position = null) -> void:
 	# Set all ships to flee to the retreat position
 	for ship in fleet.member_ships:
 		var pilot = ship.pilot
-		if pilot and pilot is AI_Pilot:
+		if pilot and pilot is AIPilot:
 			pilot.patrol_points = [retreat_position]
 			pilot.current_patrol_index = 0
-			pilot._change_state(AI_Pilot.State.FLEE)
+			pilot._change_state(AIPilot.State.FLEE)
 
 func _execute_protect_flagship_command(fleet: Fleet) -> void:
 	# Similar to defend, but specifically for protecting the flagship
@@ -388,7 +388,7 @@ func _execute_protect_flagship_command(fleet: Fleet) -> void:
 			continue
 		
 		var pilot = ship.pilot
-		if pilot and pilot is AI_Pilot:
+		if pilot and pilot is AIPilot:
 			# Calculate position around flagship
 			var angle = 2 * PI * i / ships.size()
 			var protect_pos = Vector2(cos(angle), sin(angle)) * protect_radius
@@ -399,12 +399,12 @@ func _execute_protect_flagship_command(fleet: Fleet) -> void:
 			# If there are threats, have some ships engage them
 			if tactical_assessment.threats.size() > 0 and i % 2 == 0:  # Every other ship
 				pilot.target = tactical_assessment.threats[0]
-				pilot._change_state(AI_Pilot.State.ATTACK)
+				pilot._change_state(AIPilot.State.ATTACK)
 			else:
 				# Others stay in protective formation
 				pilot.patrol_points = [fleet.flagship.global_position + protect_pos]
 				pilot.current_patrol_index = 0
-				pilot._change_state(AI_Pilot.State.PATROL)
+				pilot._change_state(AIPilot.State.PATROL)
 
 func _execute_coordinate_attack_command(fleet: Fleet, target) -> void:
 	if not target or not is_instance_valid(target):
@@ -421,8 +421,8 @@ func _execute_form_up_command(fleet: Fleet) -> void:
 	for ship in fleet.member_ships:
 		if ship != fleet.flagship:
 			var pilot = ship.pilot
-			if pilot and pilot is AI_Pilot:
-				pilot._change_state(AI_Pilot.State.IDLE)  # Temporarily idle to reform
+			if pilot and pilot is AIPilot:
+				pilot._change_state(AIPilot.State.IDLE)  # Temporarily idle to reform
 
 func _execute_patrol_command(fleet: Fleet, patrol_points) -> void:
 	# Set the fleet to patrol along the given points
@@ -430,10 +430,10 @@ func _execute_patrol_command(fleet: Fleet, patrol_points) -> void:
 		return
 	
 	# Set flagship to patrol these points
-	if fleet.flagship and fleet.flagship.pilot and fleet.flagship.pilot is AI_Pilot:
+	if fleet.flagship and fleet.flagship.pilot and fleet.flagship.pilot is AIPilot:
 		fleet.flagship.pilot.patrol_points = patrol_points
 		fleet.flagship.pilot.current_patrol_index = 0
-		fleet.flagship.pilot._change_state(AI_Pilot.State.PATROL)
+		fleet.flagship.pilot._change_state(AIPilot.State.PATROL)
 	
 	# The rest of the fleet will follow in formation
 
@@ -450,7 +450,7 @@ func _find_threats(fleet: Fleet) -> Array:
 	# For each ship in the fleet, check for visible enemies
 	for ship in fleet.member_ships:
 		var pilot = ship.pilot
-		if pilot and pilot is AI_Pilot:
+		if pilot and pilot is AIPilot:
 			# Use the pilot's detection range if available
 			var ship_detect_range = pilot.detection_range if pilot.has("detection_range") else detect_range
 			
@@ -463,8 +463,8 @@ func _find_threats(fleet: Fleet) -> Array:
 						
 						# Check pilot type to determine threat
 						for child in visible_ship.get_children():
-							if (current_strategy in [StrategyType.AGGRESSIVE, StrategyType.DEFENSIVE, StrategyType.PATROL] and child is Pirate_Pilot) or \
-							   (current_strategy == StrategyType.AGGRESSIVE and child is Police_Pilot) or \
+							if (current_strategy in [StrategyType.AGGRESSIVE, StrategyType.DEFENSIVE, StrategyType.PATROL] and child is PiratePilot) or \
+							   (current_strategy == StrategyType.AGGRESSIVE and child is PolicePilot) or \
 							   child is Player:  # Player is always considered a potential threat
 								is_threat = true
 								break
@@ -531,16 +531,16 @@ func _send_assistance(fleet: Fleet, ship_in_need: Ship, attacker: Ship = null) -
 		var ship = ship_data.ship
 		var pilot = ship.pilot
 		
-		if pilot and pilot is AI_Pilot:
+		if pilot and pilot is AIPilot:
 			if attacker and is_instance_valid(attacker):
 				# If there's an attacker, target it
 				pilot.target = attacker
-				pilot._change_state(AI_Pilot.State.CHASE)
+				pilot._change_state(AIPilot.State.CHASE)
 			else:
 				# Otherwise, move to assist position
 				pilot.patrol_points = [ship_in_need.global_position]
 				pilot.current_patrol_index = 0
-				pilot._change_state(AI_Pilot.State.PATROL)
+				pilot._change_state(AIPilot.State.PATROL)
 			
 			ships_sent += 1
 
@@ -569,10 +569,10 @@ static func _calculate_threat_priority(threat: Ship, fleet: Fleet) -> float:
 	
 	# Check pilot type to determine threat factor
 	for child in threat.get_children():
-		if child is Pirate_Pilot:
+		if child is PiratePilot:
 			threat_type_factor = 0.8  # Pirates are high threat
 			break
-		elif child is Police_Pilot:
+		elif child is PolicePilot:
 			threat_type_factor = 0.6  # Police are medium threat
 			break
 		elif child is Player:

@@ -1,8 +1,8 @@
-extends Celestial_Body
-class_name Orbiting_Body
+extends CelestialBody
+class_name OrbitingBody
 
 # Reference to the star Celestial_Body; if not assigned, defaults to (0, 0)
-@export var star: Celestial_Body
+@export var star: CelestialBody
 # Extra gravity strength applied to other bodies (such as ships)
 @export var gravity_strength: float
 # Elliptical-ness parameter (eccentricity): 0 = circular, values closer to 1 produce more elliptical orbits

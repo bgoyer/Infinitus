@@ -1,5 +1,5 @@
 extends Control
-class_name Object_Indicator
+class_name ObjectIndicator
 
 # The target node this indicator is tracking
 var target_node: Node2D
