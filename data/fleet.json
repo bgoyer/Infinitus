@@ -1,0 +1,74 @@
+{
+  "trading_caravan": {
+    "name": "Trading Caravan",
+    "faction": "trader",
+    "flagship": "cargo_hauler",
+    "ships": ["light_escort", "light_escort"],
+    "formation": "v_formation",
+    "formation_spacing": 200.0,
+    "default_behavior": "defensive"
+  },
+  "police_patrol": {
+    "name": "System Authority Patrol",
+    "faction": "police",
+    "flagship": "police_cruiser",
+    "ships": ["police_interceptor", "police_interceptor"],
+    "formation": "line",
+    "formation_spacing": 150.0,
+    "default_behavior": "patrol"
+  },
+  "pirate_gang": {
+    "name": "Outlaw Raiders",
+    "faction": "pirate",
+    "flagship": "raider_leader",
+    "ships": ["pirate_fighter", "pirate_fighter", "pirate_bomber"],
+    "formation": "wedge",
+    "formation_spacing": 180.0,
+    "default_behavior": "aggressive"
+  },
+  "player_squadron": {
+    "name": "Player's Squadron",
+    "faction": "player",
+    "flagship": "sparrow",
+    "ships": ["light_fighter", "light_fighter"],
+    "formation": "v_formation",
+    "formation_spacing": 200.0,
+    "default_behavior": "defensive"
+  },
+  "convoy_escort": {
+    "name": "Cargo Convoy with Escort",
+    "faction": "trader",
+    "flagship": "bulk_freighter",
+    "ships": ["medium_escort", "medium_escort", "light_escort", "light_escort"],
+    "formation": "square",
+    "formation_spacing": 250.0,
+    "default_behavior": "defensive"
+  },
+  "mining_operation": {
+    "name": "Mining Operation",
+    "faction": "trader",
+    "flagship": "mining_vessel",
+    "ships": ["light_escort", "cargo_hauler"],
+    "formation": "circle",
+    "formation_spacing": 300.0,
+    "default_behavior": "trade"
+  },
+  "elite_patrol": {
+    "name": "Elite Police Patrol",
+    "faction": "police",
+    "flagship": "heavy_cruiser",
+    "ships": ["police_interceptor", "police_interceptor", "police_gunship"],
+    "formation": "wedge",
+    "formation_spacing": 180.0,
+    "default_behavior": "patrol"
+  },
+  "pirate_ambush": {
+    "name": "Pirate Ambush Group",
+    "faction": "pirate",
+    "flagship": "pirate_destroyer",
+    "ships": ["stealth_fighter", "stealth_fighter", "pirate_bomber", "pirate_fighter"],
+    "formation": "circle",
+    "formation_spacing": 400.0,
+    "default_behavior": "aggressive"
+  }
+}

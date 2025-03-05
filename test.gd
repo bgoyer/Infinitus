@@ -6,7 +6,7 @@ class_name AI_Manager
 @export var trader_pilot_scene: PackedScene
 @export var police_pilot_scene: PackedScene
 @export var pirate_pilot_scene: PackedScene
-
+@onready var item_data_system = ItemDataSystem.new()
 # Spawn points and limits
 var spawn_radius: float = 5000.0
 var max_traders: int = 5
@@ -88,11 +88,8 @@ func _spawn_trader() -> void:
 	# Configure the ship and pilot
 	ship.add_child(pilot)
 	
-	# Add equipment (example)
-	var thruster = SmallThruster.new()
-	var turning = SmallTurning.new()
-	ship.add_child(thruster)
-	ship.add_child(turning)
+	ship.add_child(item_data_system.create_thruster("small_thruster"))
+	ship.add_child(item_data_system.create_turning("small_turning"))
 	
 	# Set spawn position at edge of system
 	var spawn_angle = randf() * 2 * PI
@@ -128,10 +125,8 @@ func _spawn_police() -> void:
 	ship.add_child(pilot)
 	
 	# Add equipment (example)
-	var thruster = SmallThruster.new()
-	var turning = SmallTurning.new()
-	ship.add_child(thruster)
-	ship.add_child(turning)
+	ship.add_child(item_data_system.create_thruster("small_thruster"))
+	ship.add_child(item_data_system.create_turning("small_turning"))
 	
 	# Set patrol center to system center
 	if pilot is PolicePilot:
@@ -162,10 +157,8 @@ func _spawn_pirate() -> void:
 	ship.add_child(pilot)
 	
 	# Add equipment (example)
-	var thruster = SmallThruster.new()
-	var turning = SmallTurning.new()
-	ship.add_child(thruster)
-	ship.add_child(turning)
+	ship.add_child(item_data_system.create_thruster("small_thruster"))
+	ship.add_child(item_data_system.create_turning("small_turning"))
 	
 	# Potentially set up pirate base
 	if pilot is PiratePilot and planets.size() > 0 and randf() < 0.3:
