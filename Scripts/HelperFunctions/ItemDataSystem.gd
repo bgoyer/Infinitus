@@ -13,6 +13,7 @@ const ARMOR_FILE = "armor.json"
 const THRUSTER_FILE = "thruster.json"
 const TURNING_FILE = "turning.json"
 const WEAPON_FILE = "weapon.json"
+const SHIP_FILE = "ship.json"  # New file for ship definitions
 
 # Item databases
 var capacitors: Dictionary = {}
@@ -22,12 +23,13 @@ var armors: Dictionary = {}
 var thrusters: Dictionary = {}
 var turnings: Dictionary = {}
 var weapons: Dictionary = {}
+var ships: Dictionary = {}  # New dictionary for ships
 
 # Class scripts
-var capacitor_script = preload("res://Scripts/Equipment/Energy/CapacitorBase.gd")
-var generator_script = preload("res://Scripts/Equipment/Energy/GeneratorBase.gd")
-var shield_script = preload("res://Scripts/Equipment/Defense/ShieldBase.gd")
-var armor_script = preload("res://Scripts/Equipment/Defense/ArmorBase.gd")
+var capacitor_script = preload("res://Scripts/Equipment/CapacitorBase.gd")
+var generator_script = preload("res://Scripts/Equipment/GeneratorBase.gd")
+var shield_script = preload("res://Scripts/Equipment/ShieldBase.gd")
+var armor_script = preload("res://Scripts/Equipment/ArmorBase.gd")
 var thruster_script = preload("res://Scripts/Equipment/ThrusterBase.gd")
 var turning_script = preload("res://Scripts/Equipment/TurningBase.gd")
 
@@ -36,17 +38,20 @@ var gun_script = preload("res://Scripts/Equipment/GunBase.gd")
 var turret_script = preload("res://Scripts/Equipment/TurretBase.gd")
 var missile_launcher_script = preload("res://Scripts/Equipment/MissileLauncherBase.gd")
 
+# Ship script
+var ship_script = preload("res://Scripts/Ships/Ship_Base.gd")
+
 # Signals
 signal database_loaded
 signal item_created(item_type, item_id, item_instance)
 
-func _init():
+func _init() -> void:
 	if instance == null:
 		instance = self
 	else:
 		push_error("Multiple ItemDataSystem instances created!")
 
-func _ready():
+func _ready() -> void:
 	# Load all item databases
 	load_all_databases()
 
@@ -59,6 +64,7 @@ func load_all_databases() -> void:
 	thrusters = load_database(THRUSTER_FILE)
 	turnings = load_database(TURNING_FILE)
 	weapons = load_database(WEAPON_FILE)
+	ships = load_database(SHIP_FILE)  # Load ship database
 	
 	emit_signal("database_loaded")
 
@@ -92,6 +98,99 @@ func load_database(filename: String) -> Dictionary:
 		return database
 	
 	return data
+
+# Create a ship from database
+func create_ship(ship_id: String) -> Ship:
+	if not ships.has(ship_id):
+		printerr("Ship ID not found: " + ship_id)
+		return null
+	
+	var data = ships[ship_id]
+	var ship_instance: Ship
+	
+	# Check if a scene path is provided
+	if data.has("scene_path") and ResourceLoader.exists(data.get("scene_path")):
+		var ship_scene = load(data.get("scene_path"))
+		ship_instance = ship_scene.instantiate()
+	else:
+		# Create a new ship instance
+		ship_instance = Ship.new()
+	
+	# Configure ship properties
+	ship_instance.name = data.get("name", ship_id)
+	ship_instance.max_velocity = data.get("max_velocity", 1000)
+	ship_instance.max_hull_health = data.get("max_hull_health", 100)
+	ship_instance.current_hull_health = ship_instance.max_hull_health
+	ship_instance.faction = data.get("faction", "neutral")
+	
+	# Add equipment if specified
+	if data.has("equipment"):
+		_add_equipment_to_ship(ship_instance, data["equipment"])
+	
+	emit_signal("item_created", "ship", ship_id, ship_instance)
+	return ship_instance
+
+# Helper method to add equipment to a ship
+func _add_equipment_to_ship(ship: Ship, equipment_data: Dictionary) -> void:
+	# Add thruster
+	if equipment_data.has("thruster"):
+		var thruster = create_thruster(equipment_data["thruster"])
+		if thruster:
+			ship.add_child(thruster)
+	
+	# Add turning
+	if equipment_data.has("turning"):
+		var turning = create_turning(equipment_data["turning"])
+		if turning:
+			ship.add_child(turning)
+	
+	# Add capacitor
+	if equipment_data.has("capacitor"):
+		var capacitor = create_capacitor(equipment_data["capacitor"])
+		if capacitor:
+			ship.add_child(capacitor)
+	
+	# Add generator
+	if equipment_data.has("generator"):
+		var generator = create_generator(equipment_data["generator"])
+		if generator:
+			ship.add_child(generator)
+	
+	# Add shield
+	if equipment_data.has("shield"):
+		var shield = create_shield(equipment_data["shield"])
+		if shield:
+			ship.add_child(shield)
+	
+	# Add armor
+	if equipment_data.has("armor"):
+		var armor = create_armor(equipment_data["armor"])
+		if armor:
+			ship.add_child(armor)
+	
+	# Add weapons
+	if equipment_data.has("weapons") and equipment_data["weapons"] is Array:
+		# Make sure weapon manager exists
+		var weapon_manager = ship.get_node_or_null("WeaponManager")
+		if not weapon_manager:
+			weapon_manager = WeaponManager.new()
+			weapon_manager.name = "WeaponManager"
+			ship.add_child(weapon_manager)
+		
+		for weapon_data in equipment_data["weapons"]:
+			if weapon_data is Dictionary and weapon_data.has("id") and weapon_data.has("hardpoint"):
+				var weapon = create_weapon(weapon_data["id"])
+				if weapon:
+					# Get or create hardpoint
+					var hardpoint_name = "Hardpoint" + str(weapon_data["hardpoint"])
+					var hardpoint = ship.get_node_or_null(hardpoint_name)
+					
+					if not hardpoint:
+						hardpoint = Node2D.new()
+						hardpoint.name = hardpoint_name
+						ship.add_child(hardpoint)
+					
+					hardpoint.add_child(weapon)
 
 # Create a capacitor from database
 func create_capacitor(capacitor_id: String) -> CapacitorBase:
@@ -183,8 +282,10 @@ func create_shield(shield_id: String) -> ShieldBase:
 	shield.damage_conversion = data.get("damage_conversion", 0.0)
 	
 	# Visual properties
-	var shield_color = data.get("shield_color", {"r": 0.3, "g": 0.5, "b": 1.0, "a": 0.7})
-	shield.shield_color = Color(shield_color.r, shield_color.g, shield_color.b, shield_color.a)
+	if data.has("shield_color"):
+		var color_data = data["shield_color"]
+		if color_data is Dictionary and color_data.has("r") and color_data.has("g") and color_data.has("b"):
+			shield.shield_color = Color(color_data.r, color_data.g, color_data.b, color_data.get("a", 0.7))
 	
 	# Common equipment properties
 	if data.has("description"):
@@ -251,7 +352,7 @@ func create_thruster(thruster_id: String) -> Thruster:
 	# Set thruster-specific properties
 	thruster.thrust = data.get("thrust", 25)
 	thruster.drain = data.get("drain", 1)
-	thruster.capcitor_need = data.get("capacitor_need", 1)
+	thruster.capacitor_need = data.get("capacitor_need", 1)
 	
 	# Common equipment properties
 	thruster.description = data.get("description", "Standard Thruster")
@@ -278,7 +379,7 @@ func create_turning(turning_id: String) -> Turning:
 	# Set turning-specific properties
 	turning.thrust = data.get("thrust", 4)
 	turning.drain = data.get("drain", 1)
-	turning.capcitor_need = data.get("capacitor_need", 1)
+	turning.capacitor_need = data.get("capacitor_need", 1)
 	
 	# Common equipment properties
 	turning.description = data.get("description", "Standard Turning System")
@@ -381,6 +482,8 @@ func create_item(item_type: String, item_id: String) -> Node:
 			return create_turning(item_id)
 		"weapon":
 			return create_weapon(item_id)
+		"ship":
+			return create_ship(item_id)
 		_:
 			printerr("Unknown item type: " + item_type)
 			return null
@@ -402,6 +505,8 @@ func reload_database(database_type: String) -> bool:
 			turnings = load_database(TURNING_FILE)
 		"weapon", "weapons":
 			weapons = load_database(WEAPON_FILE)
+		"ship", "ships":
+			ships = load_database(SHIP_FILE)
 		"all":
 			load_all_databases()
 		_:
@@ -427,9 +532,46 @@ func get_item_ids(item_type: String) -> Array:
 			return turnings.keys()
 		"weapon", "weapons":
 			return weapons.keys()
+		"ship", "ships":
+			return ships.keys()
 		_:
 			printerr("Unknown item type: " + item_type)
 			return []
+
+# Get filtered item IDs for a specific type based on properties
+func get_filtered_items(item_type: String, filter_property: String, filter_value) -> Array:
+	var filtered_ids = []
+	var all_items = {}
+	
+	# Get the appropriate database
+	match item_type.to_lower():
+		"capacitor", "capacitors":
+			all_items = capacitors
+		"generator", "generators":
+			all_items = generators
+		"shield", "shields":
+			all_items = shields
+		"armor", "armors":
+			all_items = armors
+		"thruster", "thrusters":
+			all_items = thrusters
+		"turning", "turnings":
+			all_items = turnings
+		"weapon", "weapons":
+			all_items = weapons
+		"ship", "ships":
+			all_items = ships
+		_:
+			printerr("Unknown item type: " + item_type)
+			return []
+	
+	# Filter items based on property
+	for id in all_items.keys():
+		var item_data = all_items[id]
+		if item_data.has(filter_property) and item_data[filter_property] == filter_value:
+			filtered_ids.append(id)
+	
+	return filtered_ids
 
 # Get item data without creating an instance
 func get_item_data(item_type: String, item_id: String) -> Dictionary:
@@ -448,6 +590,8 @@ func get_item_data(item_type: String, item_id: String) -> Dictionary:
 			return turnings.get(item_id, {})
 		"weapon", "weapons":
 			return weapons.get(item_id, {})
+		"ship", "ships":
+			return ships.get(item_id, {})
 		_:
 			printerr("Unknown item type: " + item_type)
 			return {}

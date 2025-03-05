@@ -33,54 +33,54 @@ static func create_fleet(faction: int) -> Fleet:
 	return fleet
 
 # Create a fleet with ships
-static func create_fleet_with_ships(faction: int, ship_count: int = 3, flagship_scene: PackedScene = null) -> Fleet:
+static func create_fleet_with_ships(faction: int, ship_count: int = 3, flagship_id: String = "") -> Fleet:
 	var fleet = create_fleet(faction)
 	
 	# Add ships based on faction
 	match faction:
 		FleetFaction.TRADER:
-			_add_trader_ships(fleet, ship_count, flagship_scene)
+			_add_trader_ships(fleet, ship_count, flagship_id)
 		FleetFaction.PIRATE:
-			_add_pirate_ships(fleet, ship_count, flagship_scene)
+			_add_pirate_ships(fleet, ship_count, flagship_id)
 		FleetFaction.POLICE:
-			_add_police_ships(fleet, ship_count, flagship_scene)
+			_add_police_ships(fleet, ship_count, flagship_id)
 		FleetFaction.PLAYER:
-			_add_player_ships(fleet, ship_count, flagship_scene)
+			_add_player_ships(fleet, ship_count, flagship_id)
 	
 	return fleet
 
 # Helper methods to add specific ship types
-static func _add_trader_ships(fleet: Fleet, count: int, flagship_scene: PackedScene = null) -> void:
+static func _add_trader_ships(fleet: Fleet, count: int, flagship_id: String = "") -> void:
 	# Add ships to the fleet with trader pilots
-	var flagship = _create_ship(flagship_scene, "trader")
+	var flagship = _create_ship(flagship_id, "trader")
 	fleet.add_ship(flagship)
 	
 	# Add additional ships
 	for i in range(count - 1):
-		var ship = _create_ship(null, "trader")
+		var ship = _create_ship("", "trader")
 		fleet.add_ship(ship)
 
-static func _add_pirate_ships(fleet: Fleet, count: int, flagship_scene: PackedScene = null) -> void:
+static func _add_pirate_ships(fleet: Fleet, count: int, flagship_id: String = "") -> void:
 	# Add ships to the fleet with pirate pilots
-	var flagship = _create_ship(flagship_scene, "pirate")
+	var flagship = _create_ship(flagship_id, "pirate")
 	fleet.add_ship(flagship)
 	
 	# Add additional ships
 	for i in range(count - 1):
-		var ship = _create_ship(null, "pirate")
+		var ship = _create_ship("", "pirate")
 		fleet.add_ship(ship)
 
-static func _add_police_ships(fleet: Fleet, count: int, flagship_scene: PackedScene = null) -> void:
+static func _add_police_ships(fleet: Fleet, count: int, flagship_id: String = "") -> void:
 	# Add ships to the fleet with police pilots
-	var flagship = _create_ship(flagship_scene, "police")
+	var flagship = _create_ship(flagship_id, "police")
 	fleet.add_ship(flagship)
 	
 	# Add additional ships
 	for i in range(count - 1):
-		var ship = _create_ship(null, "police")
+		var ship = _create_ship("", "police")
 		fleet.add_ship(ship)
 
-static func _add_player_ships(fleet: Fleet, count: int, flagship_scene: PackedScene = null) -> void:
+static func _add_player_ships(fleet: Fleet, count: int, flagship_id: String = "") -> void:
 	# First add player's ship as flagship
 	var player_ship = _find_player_ship()
 	
@@ -88,24 +88,61 @@ static func _add_player_ships(fleet: Fleet, count: int, flagship_scene: PackedSc
 		fleet.add_ship(player_ship)
 	else:
 		# No player ship found, create one
-		var flagship = _create_ship(flagship_scene, "player")
+		var flagship = _create_ship(flagship_id, "player")
 		fleet.add_ship(flagship)
 	
 	# Add AI escort ships
 	for i in range(count - 1):
-		var ship = _create_ship(null, "escort")
+		var ship = _create_ship("", "escort")
 		fleet.add_ship(ship)
 
 # Helper to create a single ship
-static func _create_ship(ship_scene: PackedScene = null, pilot_type: String = "") -> Ship:
+static func _create_ship(ship_id: String = "", pilot_type: String = "") -> Ship:
 	var ship: Ship
 	
-	# Use provided scene or default
-	if ship_scene:
-		ship = ship_scene.instantiate()
+	# Get reference to the ItemDataSystem instance
+	var item_system = ItemDataSystem.instance
+	
+	# If specific ship ID is provided, use it
+	if ship_id != "":
+		ship = item_system.create_ship(ship_id)
+		if not ship:
+			# Fall back to default method if ID not found
+			ship = _create_default_ship()
 	else:
-		# Use default (could be expanded to use different types based on faction)
-		ship = preload("res://Entities/Ships/Frigates/Sparrow.tscn").instantiate()
+		# Select ship based on faction/type
+		var faction_filter = ""
+		match pilot_type:
+			"trader":
+				faction_filter = "trader"
+			"pirate":
+				faction_filter = "pirate"
+			"police":
+				faction_filter = "police"
+			_:
+				faction_filter = "neutral"  # Default for player/escort
+		
+		# Try to find appropriate ship by faction
+		var ship_ids = []
+		
+		# First try exact faction match
+		ship_ids = item_system.get_filtered_items("ship", "faction", faction_filter)
+		
+		# If no ships found, try neutral ships as fallback
+		if ship_ids.size() == 0 and faction_filter != "neutral":
+			ship_ids = item_system.get_filtered_items("ship", "faction", "neutral")
+		
+		# If still no ships found, get any available ship
+		if ship_ids.size() == 0:
+			ship_ids = item_system.get_item_ids("ship")
+		
+		# Create ship from a random ID in the filtered list
+		if ship_ids.size() > 0:
+			var random_id = ship_ids[randi() % ship_ids.size()]
+			ship = item_system.create_ship(random_id)
+		else:
+			# Fall back to default if no ship definitions found
+			ship = _create_default_ship()
 	
 	# Add appropriate pilot
 	match pilot_type:
@@ -126,22 +163,48 @@ static func _create_ship(ship_scene: PackedScene = null, pilot_type: String = ""
 			var player = Player.new()
 			ship.add_child(player)
 	
-	# Add basic equipment if needed
+	# Ensure ship has necessary equipment
 	_ensure_ship_has_equipment(ship)
 	
 	return ship
 
+# Create a default ship if database fails
+static func _create_default_ship() -> Ship:
+	var ship = Ship.new()
+	ship.name = "Generic Ship"
+	ship.max_velocity = 1000
+	ship.max_hull_health = 100
+	ship.current_hull_health = 100
+	ship.faction = "neutral"
+	return ship
+
 # Ensure ship has necessary equipment
 static func _ensure_ship_has_equipment(ship: Ship) -> void:
+	var item_system = ItemDataSystem.instance
+	
 	# Check if ship has thruster
 	if not ship.is_thruster_installed():
-		var thruster = SmallThruster.new()
-		ship.add_child(thruster)
+		var thruster_ids = item_system.get_item_ids("thruster")
+		if thruster_ids.size() > 0:
+			var thruster = item_system.create_thruster(thruster_ids[0])
+			ship.add_child(thruster)
+		else:
+			# Fallback
+			var thruster = Thruster.new()
+			thruster.thrust = 25
+			ship.add_child(thruster)
 	
 	# Check if ship has turning
 	if not ship.is_turning_installed():
-		var turning = SmallTurning.new()
-		ship.add_child(turning)
+		var turning_ids = item_system.get_item_ids("turning")
+		if turning_ids.size() > 0:
+			var turning = item_system.create_turning(turning_ids[0])
+			ship.add_child(turning)
+		else:
+			# Fallback
+			var turning = Turning.new()
+			turning.thrust = 4
+			ship.add_child(turning)
 
 # Find the player ship in the scene
 static func _find_player_ship() -> Ship:
@@ -161,23 +224,21 @@ static func create_fleet_for_ship(ship: Ship, faction: int, additional_ships: in
 	# Add the existing ship as flagship
 	fleet.add_ship(ship)
 	
-	# Add additional ships based on faction
+	# Determine pilot type based on faction
+	var pilot_type = ""
 	match faction:
 		FleetFaction.TRADER:
-			for i in range(additional_ships):
-				var escort = _create_ship(null, "trader")
-				fleet.add_ship(escort)
+			pilot_type = "trader"
 		FleetFaction.PIRATE:
-			for i in range(additional_ships):
-				var escort = _create_ship(null, "pirate")
-				fleet.add_ship(escort)
+			pilot_type = "pirate"
 		FleetFaction.POLICE:
-			for i in range(additional_ships):
-				var escort = _create_ship(null, "police")
-				fleet.add_ship(escort)
+			pilot_type = "police"
 		FleetFaction.PLAYER:
-			for i in range(additional_ships):
-				var escort = _create_ship(null, "escort")
-				fleet.add_ship(escort)
+			pilot_type = "escort"
+	
+	# Add additional ships based on faction
+	for i in range(additional_ships):
+		var escort = _create_ship("", pilot_type)
+		fleet.add_ship(escort)
 	
 	return fleet

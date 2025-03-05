@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spaceship Component Editor</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #1e1e2e;
+            color: #cdd6f4;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #45475a;
+        }
+        .header h1 {
+            margin: 0;
+            color: #89b4fa;
+        }
+        .editor-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .editor-panel {
+            flex: 1;
+            min-width: 400px;
+            background-color: #313244;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .json-panel {
+            flex: 1;
+            min-width: 400px;
+            height: 500px;
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #b4befe;
+        }
+        input[type="text"], 
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #45475a;
+            border-radius: 4px;
+            background-color: #1e1e2e;
+            color: #cdd6f4;
+            font-family: inherit;
+        }
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        select {
+            height: 36px;
+        }
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            background-color: #89b4fa;
+            color: #1e1e2e;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #74c7ec;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .json-output {
+            flex-grow: 1;
+            background-color: #313244;
+            border-radius: 8px;
+            padding: 20px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            overflow-y: auto;
+            color: #f5c2e7;
+            margin-bottom: 10px;
+        }
+        .form-tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+        .tab-button {
+            padding: 8px 15px;
+            background-color: #45475a;
+            border: none;
+            border-radius: 4px;
+            color: #cdd6f4;
+            cursor: pointer;
+        }
+        .tab-button.active {
+            background-color: #89b4fa;
+            color: #1e1e2e;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .color-picker {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .color-preview {
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            border: 1px solid #45475a;
+        }
+        .item-list {
+            background-color: #1e1e2e;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 15px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        .item-list div {
+            padding: 5px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .item-list div:hover {
+            background-color: #45475a;
+        }
+        .equipment-list {
+            background-color: #2a2a3e;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .equipment-entry {
+            margin-bottom: 5px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .equipment-selector {
+            flex-grow: 1;
+            display: flex;
+            gap: 5px;
+        }
+        .add-equipment-btn {
+            padding: 5px 10px;
+            background-color: #94e2d5;
+        }
+        .remove-equipment-btn {
+            padding: 5px 10px;
+            background-color: #f38ba8;
+        }
+        .initial-load-title {
+            color: #89b4fa;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Spaceship Component Editor</h1>
+            <div>
+                <button id="saveAllButton">Save All Components</button>
+                <button id="loadAllButton">Load Components</button>
+            </div>
+        </div>
+        
+        <div class="editor-container">
+            <div class="editor-panel">
+                <div class="form-group">
+                    <label for="componentType">Component Type:</label>
+                    <select id="componentType">
+                        <option value="ship">Ship</option>
+                        <option value="capacitor">Capacitor</option>
+                        <option value="generator">Generator</option>
+                        <option value="shield">Shield</option>
+                        <option value="armor">Armor</option>
+                        <option value="thruster">Thruster</option>
+                        <option value="turning">Turning</option>
+                        <option value="weapon">Weapon</option>
+                    </select>
+                </div>
+                
+                <div class="item-list" id="itemList">
+                    <!-- Populated dynamically -->
+                </div>
+                
+                <div class="form-group">
+                    <label for="itemId">Item ID (used in code):</label>
+                    <input type="text" id="itemId" placeholder="e.g. standard_capacitor">
+                </div>
+                
+                <div class="form-tabs" id="formTabs">
+                    <button class="tab-button active" data-tab="basicTab">Basic</button>
+                    <button class="tab-button" data-tab="specificTab">Type Specific</button>
+                    <button class="tab-button" data-tab="advancedTab">Advanced</button>
+                </div>
+                
+                <!-- Basic Tab -->
+                <div class="tab-content active" id="basicTab">
+                    <div class="form-group">
+                        <label for="name">Name:</label>
+                        <input type="text" id="name" placeholder="Display name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description">Description:</label>
+                        <textarea id="description" placeholder="Component description"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="mass">Mass:</label>
+                        <input type="number" id="mass" value="10" min="0">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="value">Value (credits):</label>
+                        <input type="number" id="value" value="100" min="0">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="volume">Volume:</label>
+                        <input type="number" id="volume" value="5" min="0">
+                    </div>
+                </div>
+                
+                <!-- Type Specific Tab -->
+                <div class="tab-content" id="specificTab">
+                    <!-- Dynamically populated based on component type -->
+                </div>
+                
+                <!-- Advanced Tab -->
+                <div class="tab-content" id="advancedTab">
+                    <!-- Advanced properties for each component type -->
+                </div>
+                
+                <div class="button-group">
+                    <button id="saveButton">Save Component</button>
+                    <button id="newButton">New Component</button>
+                    <button id="deleteButton">Delete Component</button>
+                </div>
+            </div>
+            
+            <div class="json-panel">
+                <div class="json-output" id="jsonOutput">
+                    <!-- JSON output will appear here -->
+                </div>
+                <button id="copyButton">Copy JSON</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="editor.js"></script>
+</body>
+</html>
