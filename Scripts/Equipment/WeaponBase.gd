@@ -13,7 +13,7 @@ var ammo_capacity: int = -1  # -1 means unlimited ammo
 var ammo_count: int = -1  # Current ammo count
 var weapon_name: String = "Generic Weapon"
 var accuracy: float = 1.0  # 1.0 = perfect accuracy, lower values add spread
-var equipped_ship: Ship
+
 
 # Projectile scene to instance when firing
 var projectile_scene: PackedScene

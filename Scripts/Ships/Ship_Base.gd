@@ -1,31 +1,42 @@
 extends CharacterBody2D
 class_name Ship
 
-# Base ship properties
+# Basic ship properties
 var thruster: Thruster
 var turning: Turning
 var locked: bool = false
 var pilot: Pilot
 var max_velocity: float = 1000 # Default value
 
+# Hull properties (integrated directly into Ship)
+@export var max_hull_health: int = 100
+@export var current_hull_health: int = 100
+
 # Cache these components for better performance
 var _thruster_cached: bool = false
 var _turning_cached: bool = false
 
-# Combat system references
+# Component references
+var shield: ShieldBase
+var armor: ArmorBase
+var capacitor: CapacitorBase
+var generator: GeneratorBase
 var weapon_manager: WeaponManager
-var health: ShipHealth
-var energy: ShipEnergy
 
 # Faction/team for targeting purposes
 var faction: String = "neutral"
 
 # Signals
 signal weapon_fired(weapon, projectile)
-signal destroyed()
-signal health_changed(current, max_health)
+signal ship_destroyed()
+signal hull_damaged(current, max_health)
 signal shield_changed(current, max_shield)
 signal energy_changed(current, max_energy)
+signal component_attached(component)
+signal component_detached(component)
+
+# Damage types enum (shared with armor)
+enum DamageType {KINETIC, ENERGY, EXPLOSIVE, THERMAL}
 
 func _ready() -> void:
 	# Set up pilot
@@ -37,14 +48,48 @@ func _ready() -> void:
 	_thruster_cached = thruster != null
 	_turning_cached = turning != null
 	
-	# Initialize combat systems
-	_setup_combat_systems()
+	# Initialize hull health
+	current_hull_health = max_hull_health
+	
+	# Find and connect specialized systems
+	_find_and_connect_systems()
 	
 	# Connect signals
 	_connect_signals()
 	
 func _physics_process(delta: float) -> void:
 	move_and_slide()
+
+# Connect systems to the ship (called on _ready and when new components are added)
+func _find_and_connect_systems() -> void:
+	# Find shield, armor, capacitor, and generator
+	for child in get_children():
+		if child is ShieldBase and shield != child:
+			shield = child
+			shield.ship = self
+			
+		elif child is ArmorBase and armor != child:
+			armor = child
+			armor.ship = self
+			
+		elif child is CapacitorBase and capacitor != child:
+			capacitor = child
+			capacitor.ship = self
+			
+		elif child is GeneratorBase and generator != child:
+			generator = child
+			generator.ship = self
+			
+		elif child is WeaponManager and weapon_manager != child:
+			weapon_manager = child
+	
+	# Set up weapon manager if it doesn't exist
+	if not weapon_manager:
+		weapon_manager = WeaponManager.new()
+		weapon_manager.name = "WeaponManager"
+		add_child(weapon_manager)
+
+# Movement methods
 
 func accelerate(delta: float) -> void:
 	if locked == false:
@@ -56,12 +101,12 @@ func accelerate(delta: float) -> void:
 	
 	if _thruster_cached:
 		# Check energy system if available
-		if energy and thruster:
+		if capacitor and thruster:
 			# Calculate energy cost based on thruster
 			var thrust_energy_cost = thruster.drain
 			
 			# Only accelerate if we have enough energy
-			if energy.consume_energy(thrust_energy_cost * delta, "thruster"):
+			if capacitor.drain_energy(thrust_energy_cost * delta, "thruster"):
 				var current_speed = velocity.length()
 				if current_speed < max_velocity:
 					# Apply thrust in the direction the ship is facing
@@ -83,7 +128,7 @@ func accelerate(delta: float) -> void:
 			# Slight slowdown when at max speed to prevent exceeding it
 			velocity *= 0.99
 
-func accelerate_done():
+func accelerate_done() -> void:
 	locked = false
 
 func turn_left(delta: float) -> void:
@@ -121,52 +166,6 @@ func turn_behind(delta: float) -> void:
 		else:
 			turn_left(delta)
 
-# Set up weapon, health, and energy systems
-func _setup_combat_systems() -> void:
-	# Create weapon manager if it doesn't exist
-	if not has_node("WeaponManager"):
-		weapon_manager = WeaponManager.new()
-		weapon_manager.name = "WeaponManager"
-		add_child(weapon_manager)
-	else:
-		weapon_manager = $WeaponManager
-	
-	# Create health system if it doesn't exist
-	if not has_node("Health"):
-		health = ShipHealth.new()
-		health.name = "Health"
-		add_child(health)
-	else:
-		health = $Health
-	
-	# Create energy system if it doesn't exist
-	if not has_node("Energy"):
-		energy = ShipEnergy.new()
-		energy.name = "Energy"
-		add_child(energy)
-	else:
-		energy = $Energy
-
-# Connect signals from subsystems
-func _connect_signals() -> void:
-	if weapon_manager:
-		if not weapon_manager.is_connected("weapon_fired", Callable(self, "_on_weapon_fired")):
-			weapon_manager.connect("weapon_fired", Callable(self, "_on_weapon_fired"))
-	
-	if health:
-		if not health.is_connected("health_changed", Callable(self, "_on_health_changed")):
-			health.connect("health_changed", Callable(self, "_on_health_changed"))
-		
-		if not health.is_connected("shield_changed", Callable(self, "_on_shield_changed")):
-			health.connect("shield_changed", Callable(self, "_on_shield_changed"))
-		
-		if not health.is_connected("ship_destroyed", Callable(self, "_on_ship_destroyed")):
-			health.connect("ship_destroyed", Callable(self, "_on_ship_destroyed"))
-	
-	if energy:
-		if not energy.is_connected("energy_changed", Callable(self, "_on_energy_changed")):
-			energy.connect("energy_changed", Callable(self, "_on_energy_changed"))
-
 # Weapon firing methods
 func fire_primary() -> void:
 	if weapon_manager:
@@ -189,68 +188,119 @@ func clear_target() -> void:
 	if weapon_manager:
 		weapon_manager.clear_targets()
 
-# Damage handling - redirect to health system
-func take_damage(amount: int, source: Node = null, hit_position: Vector2 = Vector2.ZERO) -> void:
-	if health:
-		health.take_damage(amount, source, hit_position)
+# Damage handling - centralized in the ship
+func take_damage(amount: int, source: Node = null, hit_position: Vector2 = Vector2.ZERO, damage_type: int = DamageType.KINETIC) -> void:
+	var damage_remaining = amount
+	
+	# First try to absorb with shields if available
+	if shield and shield.is_active and shield.current_shield > 0:
+		damage_remaining = shield.absorb_damage(damage_remaining, hit_position)
+	
+	# Then try armor if available and damage remains
+	if damage_remaining > 0 and armor:
+		damage_remaining = armor.absorb_damage(damage_remaining, damage_type)
+	
+	# Finally, apply remaining damage to hull
+	if damage_remaining > 0:
+		damage_hull(damage_remaining, source, hit_position)
 
-# Energy management
+# Apply damage directly to hull
+func damage_hull(amount: int, source: Node = null, hit_position: Vector2 = Vector2.ZERO) -> void:
+	current_hull_health = max(0, current_hull_health - amount)
+	
+	emit_signal("hull_damaged", current_hull_health, max_hull_health)
+	
+	# Check if ship is destroyed
+	if current_hull_health <= 0:
+		_handle_destruction()
+
+# Handle ship destruction
+func _handle_destruction() -> void:
+	emit_signal("ship_destroyed")
+	
+	# Create explosion effect (would be replaced with actual effect)
+	# var explosion = preload("res://Scenes/Effects/ShipExplosion.tscn").instantiate()
+	# get_tree().root.add_child(explosion)
+	# explosion.global_position = global_position
+	
+	# Remove the ship
+	queue_free()
+
+# Energy management methods
 func has_energy(amount: int) -> bool:
-	return energy != null and energy.has_energy(amount)
+	return capacitor != null and capacitor.has_energy(amount)
 
 func consume_energy(amount: int, source: String = "unknown") -> bool:
-	return energy != null and energy.consume_energy(amount, source)
+	return capacitor != null and capacitor.drain_energy(amount, source)
 
-# Check if ship is allied with another ship (for targeting)
-func is_allied_with(other_ship: Ship) -> bool:
-	return other_ship.faction == faction
+func add_energy(amount: int) -> int:
+	if capacitor:
+		return capacitor.add_energy(amount)
+	return 0
+
+# Repair methods
+func repair_hull(amount: int) -> void:
+	current_hull_health = min(current_hull_health + amount, max_hull_health)
+	emit_signal("hull_damaged", current_hull_health, max_hull_health)
+
+func repair_armor(amount: float) -> void:
+	if armor:
+		armor.repair(amount)
+
+func recharge_shield(amount: int) -> void:
+	if shield:
+		shield.current_shield = min(shield.current_shield + amount, shield.max_shield)
+		emit_signal("shield_changed", shield.current_shield, shield.max_shield)
+
+# Signal connections
+func _connect_signals() -> void:
+	# Connect shield signals
+	if shield:
+		if not shield.is_connected("shield_changed", Callable(self, "_on_shield_changed")):
+			shield.connect("shield_changed", Callable(self, "_on_shield_changed"))
+	
+	# Connect capacitor signals
+	if capacitor:
+		if not capacitor.is_connected("energy_changed", Callable(self, "_on_energy_changed")):
+			capacitor.connect("energy_changed", Callable(self, "_on_energy_changed"))
+	
+	# Connect weapon manager signals
+	if weapon_manager:
+		if not weapon_manager.is_connected("weapon_fired", Callable(self, "_on_weapon_fired")):
+			weapon_manager.connect("weapon_fired", Callable(self, "_on_weapon_fired"))
 
 # Signal handlers
-func _on_weapon_fired(weapon: Weapon, projectile) -> void:
-	emit_signal("weapon_fired", weapon, projectile)
-
-func _on_health_changed(current: int, max_value: int) -> void:
-	emit_signal("health_changed", current, max_value)
-
 func _on_shield_changed(current: int, max_value: int) -> void:
 	emit_signal("shield_changed", current, max_value)
 
 func _on_energy_changed(current: int, max_value: int) -> void:
 	emit_signal("energy_changed", current, max_value)
 
-func _on_ship_destroyed() -> void:
-	emit_signal("destroyed")
+func _on_weapon_fired(weapon: Weapon, projectile) -> void:
+	emit_signal("weapon_fired", weapon, projectile)
 
-# Called when weapons are fired (for reactions like recoil)
-func on_weapons_fired(group_name: String) -> void:
-	# Add visual feedback, camera shake, etc.
-	if group_name == "primary":
-		# Maybe add a small impulse in the opposite direction
-		pass
-	elif group_name == "secondary":
-		# Different reaction for secondary weapons
-		pass
-	elif group_name == "tertiary":
-		# Different reaction for missiles/heavy weapons
-		pass
+# Called when new node is added to this ship
+func _on_child_entered_tree(node: Node) -> void:
+	# Check if this is a component we need to connect
+	if node is ShieldBase or node is ArmorBase or node is CapacitorBase or node is GeneratorBase:
+		_find_and_connect_systems()
+		emit_signal("component_attached", node)
 
-# Helper function to add a weapon to the ship
-func add_weapon(weapon_scene: PackedScene, hardpoint_index: int) -> Weapon:
-	if not weapon_manager:
-		return null
+# Called when a node is removed from this ship
+func _on_child_exiting_tree(node: Node) -> void:
+	# Check if this is a component we need to disconnect
+	if node is ShieldBase or node is ArmorBase or node is CapacitorBase or node is GeneratorBase:
+		emit_signal("component_detached", node)
 		
-	var weapon = weapon_scene.instantiate()
-	if weapon_manager.add_weapon(weapon, hardpoint_index):
-		return weapon
-	else:
-		weapon.queue_free()
-		return null
-
-# Helper to get all weapons on the ship
-func get_weapons() -> Array[Weapon]:
-	if weapon_manager:
-		return weapon_manager.weapons
-	return []
+		# Reset references if needed
+		if node is ShieldBase and shield == node:
+			shield = null
+		elif node is ArmorBase and armor == node:
+			armor = null
+		elif node is CapacitorBase and capacitor == node:
+			capacitor = null
+		elif node is GeneratorBase and generator == node:
+			generator = null
 
 ####################################Checks######################################
 
@@ -278,3 +328,18 @@ func get_turning() -> Turning:
 		if child is Turning:
 			return child
 	return null
+
+# Check if ship is allied with another ship (for targeting)
+func is_allied_with(other_ship: Ship) -> bool:
+	return other_ship.faction == faction
+
+# Helper function to add a component to the ship
+func add_component(component: Node) -> void:
+	add_child(component)
+	# The _on_child_entered_tree handler will take care of connections
+
+# Helper function to remove a component from the ship
+func remove_component(component: Node) -> void:
+	if component and component.get_parent() == self:
+		remove_child(component)
+		# The _on_child_exiting_tree handler will take care of disconnections

@@ -36,13 +36,15 @@ func _ready():
 	
 	# Add screen notifier if enabled
 	if add_screen_notifier:
-		create_screen_notifier(screen_notifier_size)
+		call_deferred("create_screen_notifier", screen_notifier_size)
 
 # Creates and adds a VisibleOnScreenNotifier2D to the parent
 func create_screen_notifier(rect_size: Vector2 = Vector2(100, 100)) -> VisibleOnScreenNotifier2D:
 	# Check if parent already has a screen notifier
 	for child in get_parent().get_children():
 		if child is VisibleOnScreenNotifier2D:
+			# Update existing notifier size
+			child.rect = Rect2(-rect_size/2, rect_size)
 			return child
 	
 	# Create a new screen notifier
@@ -51,7 +53,7 @@ func create_screen_notifier(rect_size: Vector2 = Vector2(100, 100)) -> VisibleOn
 	notifier.name = "ScreenNotifier"
 	
 	# Add it to the parent
-	get_parent().add_child.call_deferred(notifier)
+	get_parent().add_child(notifier)
 	
 	return notifier
 
@@ -84,7 +86,7 @@ func set_tracked(enable: bool) -> void:
 
 # Adjusts the screen notifier size
 func update_screen_notifier_size(new_size: Vector2) -> void:
-	screen_notifier_size = get_tree().root.get_node("Sprite2D").get_size()
+	screen_notifier_size = new_size
 	
 	# Find existing notifier
 	for child in get_parent().get_children():

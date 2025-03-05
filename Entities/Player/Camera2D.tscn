@@ -1,6 +1,6 @@
 [gd_scene load_steps=8 format=3 uid="uid://vkhxcudl5joq"]
 
-[ext_resource type="Script" uid="uid://bfkkudj6g6xc6" path="res://Scripts/Game_Logic/Camera2D.tres.gd" id="1_2hrw8"]
+[ext_resource type="Script" uid="uid://bfkkudj6g6xc6" path="res://Scripts/Game_Logic/Camera2D.gd" id="1_2hrw8"]
 [ext_resource type="PackedScene" uid="uid://cle0ocgpn28s" path="res://UI/Main.tscn" id="1_i68qq"]
 [ext_resource type="Texture2D" uid="uid://c77uejhoy1uwn" path="res://Images/Texture/Backgrounds/Starfields/Starfield 1.png" id="1_jfehw"]
 [ext_resource type="Texture2D" uid="uid://2e008ut7sywi" path="res://Images/Texture/Backgrounds/Purple Nebula/Purple Nebula 1 - 1024x1024.png" id="2_60e16"]
@@ -15,6 +15,7 @@ light_mode = 1
 [node name="Camera2D" type="Camera2D"]
 zoom = Vector2(0.02, 0.02)
 script = ExtResource("1_2hrw8")
+metadata/_custom_type_script = "uid://bfkkudj6g6xc6"
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 

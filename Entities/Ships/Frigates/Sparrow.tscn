@@ -1,7 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://dhnmap04c534h"]
+[gd_scene load_steps=7 format=3 uid="uid://dhnmap04c534h"]
 
 [ext_resource type="Script" uid="uid://cyxih312lfh0f" path="res://Scripts/Ships/Frigates/sparrow.gd" id="1_hp2ed"]
 [ext_resource type="Texture2D" uid="uid://cbis3s0lgt1bb" path="res://Images/Texture/Ship/sparrow.png" id="1_nsvpc"]
+[ext_resource type="Script" uid="uid://44dhflug6701" path="res://Scripts/HelperFunctions/Tracked_Object.gd" id="3_uhhob"]
+[ext_resource type="Script" uid="uid://b0pvg2vglk4ip" path="res://Scripts/Ships/ShipEnergy.gd" id="4_bjtg7"]
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_42w4b"]
 light_mode = 1
@@ -10,8 +12,8 @@ light_mode = 1
 diffuse_texture = ExtResource("1_nsvpc")
 
 [node name="Sparrow" type="CharacterBody2D"]
-collision_layer = 2147483652
-collision_mask = 4
+collision_layer = 2147483655
+collision_mask = 0
 script = ExtResource("1_hp2ed")
 metadata/_custom_type_script = "uid://cyxih312lfh0f"
 
@@ -22,3 +24,11 @@ texture = SubResource("CanvasTexture_5m0yt")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
 polygon = PackedVector2Array(-1, -79, -12, -62, -11, -11, -65, 1, -65, 17, -30, 15, -12, 40, -33, 50, -38, 63, -18, 62, -5, 78, 5, 79, 17, 62, 38, 62, 33, 49, 11, 43, 32, 16, 63, 19, 64, 1, 12, -9, 12, -61)
+
+[node name="TrackedObject" type="Node" parent="."]
+script = ExtResource("3_uhhob")
+metadata/_custom_type_script = "uid://44dhflug6701"
+
+[node name="ShipEnergy" type="Node" parent="."]
+script = ExtResource("4_bjtg7")
+metadata/_custom_type_script = "uid://b0pvg2vglk4ip"

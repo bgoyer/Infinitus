@@ -31,4 +31,5 @@ shape = SubResource("CircleShape2D_sao0t")
 
 [node name="Tracked_Object" type="Node" parent="."]
 script = ExtResource("4_6u06a")
+indicator_name = "Red Dwarf"
 metadata/_custom_type_script = "uid://44dhflug6701"
