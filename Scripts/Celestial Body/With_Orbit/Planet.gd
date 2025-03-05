@@ -99,9 +99,10 @@ func _apply_gravity(delta: float) -> void:
 			if body_distance > 400:
 				body.velocity += direction * (gravity_strength / 500) * delta
 			else:
-				if body.thruster.is_active == false:
-					body.velocity = Vector2.ZERO
-					body.position = lerp(body.position, position, 1 - (body_distance - delta) / 400)
+				if body.thruster:
+					if body.thruster.is_active == false:
+						body.velocity = Vector2.ZERO
+				body.position = lerp(body.position, position, 1 - (body_distance - delta) / 400)
 
 func update_speed() -> void:
 	if last_position != Vector2.ZERO:

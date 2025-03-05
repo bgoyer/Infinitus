@@ -5,11 +5,9 @@ class_name AIFactory
 enum AI_Type {TRADER, POLICE, PIRATE}
 
 # Scene references - would be set in the inspector
-var trader_pilot_scene: PackedScene = preload("res://Entities/NPCs/Pirate_Pilot.tscn")
-var police_pilot_scene: PackedScene = preload("res://Entities/NPCs/Police_Pilot.tscn")
-var pirate_pilot_scene: PackedScene = preload("res://Entities/NPCs/Trader_Pilot.tscn")
-var small_thruster_scene: PackedScene = preload("res://Entities/Equipment/Small/SmallThruster.tscn")
-var small_turning_scene: PackedScene = preload("res://Entities/Equipment/Small/SmallTurning.tscn")
+var trader_pilot_scene: PackedScene = preload("res://Pilot_Types/Trader_Pilot.tscn")
+var police_pilot_scene: PackedScene = preload("res://Pilot_Types/Police_Pilot.tscn")
+var pirate_pilot_scene: PackedScene = preload("res://Pilot_Types/Pirate_Pilot.tscn")
 
 # Ship scene references
 @export var frigates: Array[PackedScene]
@@ -25,7 +23,7 @@ var small_turning_scene: PackedScene = preload("res://Entities/Equipment/Small/S
 
 # Spawn locations
 @export var spawn_points: Array[Node2D]  # Points where ships can spawn
-@export var planets: Array[Orbiting_Body]  # Planets for trade routes and police patrols
+@export var planets: Array[Planet]  # Planets for trade routes and police patrols
 
 # Reference to the current map
 var current_map: Map
@@ -179,14 +177,11 @@ func _setup_pirate_pilot(pilot: PiratePilot) -> void:
 
 func _add_basic_equipment(ship_instance: Ship) -> void:
 	# Add thruster
-	if small_thruster_scene:
-		var thruster = small_thruster_scene.instantiate()
-		ship_instance.add_child(thruster)
-	
-	# Add turning
-	if small_turning_scene:
-		var turning = small_turning_scene.instantiate()
-		ship_instance.add_child(turning)
+	var thruster = GameManagerInstance.item_data_system.create_thruster("small_thruster")
+	ship_instance.add_child(thruster)
+
+	var turning = GameManagerInstance.item_data_system.create_thruster("small_turning")
+	ship_instance.add_child(turning)
 
 func _cleanup_spawned_ships() -> void:
 	var valid_ships = []
@@ -194,8 +189,8 @@ func _cleanup_spawned_ships() -> void:
 	for ship in spawned_ships:
 		if is_instance_valid(ship) and not ship.is_queued_for_deletion():
 			valid_ships.append(ship)
-	
-	spawned_ships = valid_ships
+	if valid_ships.size() > 0:
+		spawned_ships = valid_ships
 
 # Public functions for manual spawning
 func spawn_trader() -> Ship:

@@ -9,7 +9,8 @@ var error_handler: ErrorHandler
 var scene_manager: SceneManager
 var resource_manager: ResourceManager
 var physics_optimizer: PhysicsOptimizer
-
+var item_data_system: ItemDataSystem
+var ai_factory: AIFactory
 # Performance monitoring
 var fps_tracker: Array = []
 var frame_times: Array = []
@@ -40,6 +41,7 @@ func _init() -> void:
 		push_error("GameManager instance already exists!")
 
 func _ready() -> void:
+
 	# Detect platform and set initial quality
 	_detect_platform()
 	
@@ -69,7 +71,7 @@ func _process(delta: float) -> void:
 	
 	# Track memory usage - using the correct Godot 4.3 functions
 	var memory_usage = {
-		"total_memory": OS.get_memory_info()["total"] / (1024.0 * 1024.0), # MB
+		"total_memory": OS.get_static_memory_usage() / (1024.0 * 1024.0), # MB
 		"available_static": OS.get_memory_info()["free"] / (1024.0 * 1024.0), # MB
 		"time": Time.get_unix_time_from_system()
 	}
@@ -105,6 +107,13 @@ func _initialize_systems() -> void:
 	# Create PhysicsOptimizer
 	physics_optimizer = PhysicsOptimizer.new()
 	add_child(physics_optimizer)
+	
+	# Initialize ItemDataSystem
+	item_data_system = ItemDataSystem.new()
+	add_child(item_data_system)
+	
+	ai_factory = AIFactory.new()
+	add_child(ai_factory)
 	
 	# Set initial quality settings
 	_apply_quality_settings()
@@ -151,7 +160,7 @@ func _apply_quality_settings() -> void:
 			physics_optimizer.physics_pause_distance = 6000.0
 			
 			# Visual settings
-			get_viewport().msaa = Viewport.MSAA_DISABLED
+			get_viewport().msaa_2d = Viewport.MSAA_DISABLED
 			get_viewport().use_debanding = false
 			
 			# Custom settings for your game
@@ -166,7 +175,7 @@ func _apply_quality_settings() -> void:
 			physics_optimizer.physics_pause_distance = 8000.0
 			
 			# Visual settings
-			get_viewport().msaa = Viewport.MSAA_2X
+			get_viewport().msaa_2d = Viewport.MSAA_2X
 			get_viewport().use_debanding = true
 			
 			# Custom settings for your game
@@ -181,7 +190,7 @@ func _apply_quality_settings() -> void:
 			physics_optimizer.physics_pause_distance = 10000.0
 			
 			# Visual settings
-			get_viewport().msaa = Viewport.MSAA_4X
+			get_viewport().msaa_2d = Viewport.MSAA_4X
 			get_viewport().use_debanding = true
 			
 			# Custom settings for your game
