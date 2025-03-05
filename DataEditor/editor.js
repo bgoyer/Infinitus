@@ -343,6 +343,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             updateItemList();
                             updateJsonOutput();
                             updateTypeSpecificFields();
+                            setupSaveAllButtons(); // Initialize Save buttons after components are loaded
                         }
                     } catch (error) {
                         console.error('Error parsing JSON:', error);
@@ -356,6 +357,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             updateItemList();
                             updateJsonOutput();
                             updateTypeSpecificFields();
+                            setupSaveAllButtons(); // Initialize Save buttons after components are loaded
                         }
                     }
                 };
@@ -424,19 +426,89 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     });
     
-    // Save all components button
-    saveAllButton.addEventListener('click', () => {
-        const jsonString = JSON.stringify(componentDatabase, null, 2);
+    // Modified Save All Components functionality - creates a dropdown
+    function setupSaveAllButtons() {
+        const headerSaveContainer = document.querySelector('.header > div');
+        if (!headerSaveContainer) return;
+        
+        // Remove the old save all button
+        if (saveAllButton) {
+            saveAllButton.remove();
+        }
+        
+        // Create dropdown for save options
+        const saveDropdown = document.createElement('select');
+        saveDropdown.id = 'saveTypeSelector';
+        saveDropdown.style.padding = '10px';
+        saveDropdown.style.marginRight = '10px';
+        saveDropdown.style.backgroundColor = '#45475a';
+        saveDropdown.style.color = '#cdd6f4';
+        saveDropdown.style.border = 'none';
+        saveDropdown.style.borderRadius = '4px';
+        
+        // Add option for saving all types
+        const allOption = document.createElement('option');
+        allOption.value = 'all';
+        allOption.textContent = 'All Types';
+        saveDropdown.appendChild(allOption);
+        
+        // Add options for each component type
+        Object.keys(componentDatabase).forEach(type => {
+            const option = document.createElement('option');
+            option.value = type;
+            option.textContent = type.charAt(0).toUpperCase() + type.slice(1) + 's';
+            saveDropdown.appendChild(option);
+        });
+        
+        // Create new save button
+        const newSaveButton = document.createElement('button');
+        newSaveButton.id = 'newSaveButton';
+        newSaveButton.textContent = 'Save Selected';
+        
+        // Add event listener for save button
+        newSaveButton.addEventListener('click', () => {
+            const selectedType = saveDropdown.value;
+            
+            if (selectedType === 'all') {
+                // Save each type to a separate file
+                Object.keys(componentDatabase).forEach(type => {
+                    if (Object.keys(componentDatabase[type]).length > 0) {
+                        saveComponentTypeToFile(type);
+                    }
+                });
+                
+                alert('All component types saved to separate files!');
+            } else {
+                // Save only the selected type
+                if (Object.keys(componentDatabase[selectedType]).length > 0) {
+                    saveComponentTypeToFile(selectedType);
+                    alert(`${selectedType}.json saved!`);
+                } else {
+                    alert(`No components found for type: ${selectedType}`);
+                }
+            }
+        });
+        
+        // Add elements to the header
+        headerSaveContainer.innerHTML = '';
+        headerSaveContainer.appendChild(saveDropdown);
+        headerSaveContainer.appendChild(newSaveButton);
+        headerSaveContainer.appendChild(loadAllButton);
+    }
+    
+    // Function to save a specific component type to a file
+    function saveComponentTypeToFile(type) {
+        const jsonString = JSON.stringify(componentDatabase[type], null, 2);
         const blob = new Blob([jsonString], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'component_database.json';
+        a.download = `${type}.json`;
         a.click();
         
         URL.revokeObjectURL(url);
-    });
+    }
     
     // Load components button
     loadAllButton.addEventListener('click', () => {
