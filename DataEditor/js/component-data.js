@@ -4,7 +4,7 @@
  */
 
 // Components database
-export let componentDatabase = {
+let componentDatabase = {
     ship: {},
     capacitor: {},
     generator: {},
@@ -20,7 +20,7 @@ export let componentDatabase = {
  * @param {Object} data - The component data to process
  * @param {string} filename - The filename for component type determination
  */
-export function processComponentData(data, filename) {
+function processComponentData(data, filename) {
     // If no data or empty object, skip
     if (!data || Object.keys(data).length === 0) return;
     
@@ -83,7 +83,7 @@ export function processComponentData(data, filename) {
  * Save a specific component type to a file
  * @param {string} type - The component type to save
  */
-export function saveComponentTypeToFile(type) {
+function saveComponentTypeToFile(type) {
     const jsonString = JSON.stringify(componentDatabase[type], null, 2);
     const blob = new Blob([jsonString], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -102,7 +102,7 @@ export function saveComponentTypeToFile(type) {
  * @param {Function} onComplete - Callback function when all files are processed
  * @param {Function} onProgress - Callback function for progress updates
  */
-export function loadComponentFiles(files, onComplete, onProgress) {
+function loadComponentFiles(files, onComplete, onProgress) {
     if (files.length === 0) return;
     
     let filesProcessed = 0;
@@ -147,7 +147,7 @@ export function loadComponentFiles(files, onComplete, onProgress) {
  * @param {string} id - Component ID
  * @returns {Object|null} - The component data or null if not found
  */
-export function getComponent(type, id) {
+function getComponent(type, id) {
     if (componentDatabase[type] && componentDatabase[type][id]) {
         return componentDatabase[type][id];
     }
@@ -160,7 +160,7 @@ export function getComponent(type, id) {
  * @param {string} id - Component ID
  * @param {Object} data - Component data
  */
-export function saveComponent(type, id, data) {
+function saveComponent(type, id, data) {
     if (type && id && data) {
         componentDatabase[type][id] = data;
         return true;
@@ -174,7 +174,7 @@ export function saveComponent(type, id, data) {
  * @param {string} id - Component ID
  * @returns {boolean} - Success status
  */
-export function deleteComponent(type, id) {
+function deleteComponent(type, id) {
     if (componentDatabase[type] && componentDatabase[type][id]) {
         delete componentDatabase[type][id];
         return true;
@@ -187,7 +187,7 @@ export function deleteComponent(type, id) {
  * @param {string} type - Component type
  * @returns {string[]} - Array of component IDs
  */
-export function getComponentIdsForType(type) {
+function getComponentIdsForType(type) {
     if (componentDatabase[type]) {
         return Object.keys(componentDatabase[type]);
     }
@@ -199,6 +199,6 @@ export function getComponentIdsForType(type) {
  * @param {string} type - Component type
  * @returns {Object} - Object containing all components of the specified type
  */
-export function getComponentsOfType(type) {
+function getComponentsOfType(type) {
     return componentDatabase[type] || {};
 }

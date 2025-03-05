@@ -3,51 +3,6 @@
  * Main application entry point and initialization
  */
 
-import { defaultComponentFiles } from './definitions.js';
-import { 
-    loadComponentFiles, 
-    processComponentData, 
-    saveComponentTypeToFile,
-    getComponentIdsForType,
-    getComponent,
-    saveComponent,
-    deleteComponent
-} from './component-data.js';
-import { 
-    createInitialLoadInterface,
-    updateItemList,
-    updateJsonOutput,
-    setupTabs,
-    showLoadingScreen,
-    updateLoadingProgress,
-    hideLoadingShowEditor,
-    setupSaveDropdown,
-    toggleHardpointsTab,
-    setCurrentSelection,
-    getCurrentSelection
-} from './ui-manager.js';
-import { 
-    createTypeSpecificFields,
-    clearFormFields,
-    collectFormData
-} from './form-fields.js';
-import {
-    resetEquipment,
-    setEquipment,
-    getEquipment,
-    createEquipmentSelector,
-    updateEquipmentSelectors,
-    rebuildEquipmentSelectors,
-    getEquipmentData
-} from './equipment-manager.js';
-import {
-    resetShipData,
-    setShipData,
-    createHardpointEditor,
-    getHardpointData,
-    getSpriteData
-} from './hardpoint-editor.js';
-
 // Initialize the editor
 document.addEventListener('DOMContentLoaded', () => {
     // Get DOM elements

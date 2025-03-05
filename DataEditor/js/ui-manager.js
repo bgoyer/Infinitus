@@ -3,9 +3,6 @@
  * Handles UI updates, item lists, and JSON display
  */
 
-import { getComponentIdsForType, getComponent } from './component-data.js';
-import { defaultComponentFiles } from './definitions.js';
-
 // Current state
 let currentType = '';
 let currentId = '';
@@ -15,7 +12,7 @@ let currentId = '';
  * @param {string} type - Component type
  * @param {Function} onItemClick - Callback for item click
  */
-export function updateItemList(type, onItemClick) {
+function updateItemList(type, onItemClick) {
     currentType = type;
     const itemList = document.getElementById('itemList');
     if (!itemList) return;
@@ -55,7 +52,7 @@ export function updateItemList(type, onItemClick) {
  * @param {string} id - Component ID or null for all
  * @param {Object} customData - Custom data to display instead of database component
  */
-export function updateJsonOutput(type, id, customData = null) {
+function updateJsonOutput(type, id, customData = null) {
     const jsonOutput = document.getElementById('jsonOutput');
     if (!jsonOutput) return;
     
@@ -90,7 +87,7 @@ export function updateJsonOutput(type, id, customData = null) {
 /**
  * Set up tab switching
  */
-export function setupTabs() {
+function setupTabs() {
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabContents = document.querySelectorAll('.tab-content');
     
@@ -113,7 +110,7 @@ export function setupTabs() {
  * Create initial loading interface
  * @param {Function} onLoadFiles - Callback for loading files
  */
-export function createInitialLoadInterface(onLoadFiles) {
+function createInitialLoadInterface(onLoadFiles) {
     // Create a new element for initial component loading
     const initialLoadButton = document.createElement('button');
     initialLoadButton.id = 'initialLoadButton';
@@ -177,7 +174,7 @@ export function createInitialLoadInterface(onLoadFiles) {
  * @param {number} totalFiles - Total number of files
  * @param {string|null} errorMessage - Optional error message
  */
-export function updateLoadingProgress(filesProcessed, totalFiles, errorMessage = null) {
+function updateLoadingProgress(filesProcessed, totalFiles, errorMessage = null) {
     const loadingProgress = document.getElementById('loadingProgress');
     if (loadingProgress) {
         if (errorMessage) {
@@ -194,7 +191,7 @@ export function updateLoadingProgress(filesProcessed, totalFiles, errorMessage =
  * Show loading screen
  * @param {number} totalFiles - Total number of files to process
  */
-export function showLoadingScreen(totalFiles) {
+function showLoadingScreen(totalFiles) {
     const initialLoadMessage = document.getElementById('initialLoadMessage');
     const initialLoadButton = document.getElementById('initialLoadButton');
     
@@ -212,7 +209,7 @@ export function showLoadingScreen(totalFiles) {
 /**
  * Hide loading screen and show editor
  */
-export function hideLoadingShowEditor() {
+function hideLoadingShowEditor() {
     const initialLoadContainer = document.getElementById('initialLoadContainer');
     const editorContainer = document.querySelector('.editor-container');
     
@@ -230,7 +227,7 @@ export function hideLoadingShowEditor() {
  * @param {Function} onSaveType - Callback for saving specific component type
  * @param {Function} onSaveAll - Callback for saving all component types
  */
-export function setupSaveDropdown(onSaveType, onSaveAll) {
+function setupSaveDropdown(onSaveType, onSaveAll) {
     const headerSaveContainer = document.querySelector('.header > div');
     if (!headerSaveContainer) return;
     
@@ -338,7 +335,7 @@ function getComponentTypes() {
  * Show/hide hardpoints tab based on component type
  * @param {string} type - Component type
  */
-export function toggleHardpointsTab(type) {
+function toggleHardpointsTab(type) {
     const hardpointsTab = document.querySelector('.tab-button[data-tab="hardpointsTab"]');
     const hardpointsTabContent = document.getElementById('hardpointsTab');
     
@@ -364,7 +361,7 @@ export function toggleHardpointsTab(type) {
  * Get current component type and ID
  * @returns {Object} - Object with type and id properties
  */
-export function getCurrentSelection() {
+function getCurrentSelection() {
     return { type: currentType, id: currentId };
 }
 
@@ -373,7 +370,7 @@ export function getCurrentSelection() {
  * @param {string} type - Component type
  * @param {string} id - Component ID
  */
-export function setCurrentSelection(type, id) {
+function setCurrentSelection(type, id) {
     currentType = type;
     currentId = id;
 }

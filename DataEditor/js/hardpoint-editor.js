@@ -3,8 +3,6 @@
  * Manages the ship hardpoint editor functionality
  */
 
-import { updateJsonOutput } from './ui-manager.js';
-
 // Current ship data for hardpoints
 let currentShipData = {
     hardpoints: [],
@@ -26,7 +24,7 @@ let spriteInfo = {
 /**
  * Reset ship data for hardpoints
  */
-export function resetShipData() {
+function resetShipData() {
     currentShipData = {
         hardpoints: [],
         sprite: null
@@ -48,7 +46,7 @@ export function resetShipData() {
  * Get current ship data
  * @returns {Object} - Current ship data
  */
-export function getShipData() {
+function getShipData() {
     return { ...currentShipData };
 }
 
@@ -56,7 +54,7 @@ export function getShipData() {
  * Set ship data
  * @param {Object} data - Ship data to set
  */
-export function setShipData(data) {
+function setShipData(data) {
     if (!data) return;
     
     resetShipData();
@@ -77,7 +75,7 @@ export function setShipData(data) {
  * @param {HTMLElement} container - Container element for hardpoint editor
  * @param {Function} onChange - Callback for when hardpoints change
  */
-export function createHardpointEditor(container) {
+function createHardpointEditor(container) {
     if (!container) return;
     
     container.innerHTML = '';
@@ -647,7 +645,7 @@ function removeAllHardpointMarkers() {
  * Get hardpoint data for saving
  * @returns {Array|null} - Array of hardpoints or null if none
  */
-export function getHardpointData() {
+function getHardpointData() {
     if (currentShipData.hardpoints && currentShipData.hardpoints.length > 0) {
         return [...currentShipData.hardpoints];
     }
@@ -658,6 +656,6 @@ export function getHardpointData() {
  * Get sprite data for saving
  * @returns {string|null} - Sprite data URI or null if none
  */
-export function getSpriteData() {
+function getSpriteData() {
     return currentShipData.sprite || null;
 }

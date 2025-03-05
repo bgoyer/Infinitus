@@ -3,14 +3,12 @@
  * Creates and manages form field elements for the editor
  */
 
-import { fieldDefinitions } from './definitions.js';
-
 /**
  * Create form field based on field definition
  * @param {Object} field - Field definition
  * @returns {HTMLElement} - Form field container element
  */
-export function createFormField(field) {
+function createFormField(field) {
     const formGroup = document.createElement('div');
     formGroup.className = 'form-group';
     
@@ -144,7 +142,7 @@ export function createFormField(field) {
  * @param {*} value - Field value
  * @param {string} fieldType - Field type
  */
-export function setFormFieldValue(fieldId, value, fieldType) {
+function setFormFieldValue(fieldId, value, fieldType) {
     const input = document.getElementById(fieldId);
     if (!input) return;
     
@@ -161,7 +159,7 @@ export function setFormFieldValue(fieldId, value, fieldType) {
  * @param {string} fieldType - Field type
  * @returns {*} - Field value
  */
-export function getFormFieldValue(fieldId, fieldType) {
+function getFormFieldValue(fieldId, fieldType) {
     const input = document.getElementById(fieldId);
     if (!input) return null;
     
@@ -179,7 +177,7 @@ export function getFormFieldValue(fieldId, fieldType) {
  * @param {string} fieldId - Base field ID
  * @returns {Object} - RGBA color object
  */
-export function getColorFieldValues(fieldId) {
+function getColorFieldValues(fieldId) {
     const colorComponents = ['r', 'g', 'b', 'a'];
     const colorData = {};
     
@@ -197,7 +195,7 @@ export function getColorFieldValues(fieldId) {
  * Set color field values
  * @param {Object} colorData - RGBA color object
  */
-export function setColorFieldValues(colorData) {
+function setColorFieldValues(colorData) {
     if (!colorData) return;
     
     const colorComponents = ['r', 'g', 'b', 'a'];
@@ -227,7 +225,7 @@ export function setColorFieldValues(colorData) {
  * @param {HTMLElement} specificTabContent - Container for specific fields
  * @param {HTMLElement} advancedTabContent - Container for advanced fields
  */
-export function createTypeSpecificFields(componentType, specificTabContent, advancedTabContent) {
+function createTypeSpecificFields(componentType, specificTabContent, advancedTabContent) {
     // Clear current fields
     specificTabContent.innerHTML = '';
     advancedTabContent.innerHTML = '';
@@ -255,7 +253,7 @@ export function createTypeSpecificFields(componentType, specificTabContent, adva
  * Clear all form fields
  * @param {string} componentType - Current component type
  */
-export function clearFormFields(componentType) {
+function clearFormFields(componentType) {
     // Reset basic fields
     document.getElementById('name').value = '';
     document.getElementById('description').value = '';
@@ -326,7 +324,7 @@ export function clearFormFields(componentType) {
  * @param {string} id - Component ID
  * @returns {Object} - Collected component data
  */
-export function collectFormData(type, id) {
+function collectFormData(type, id) {
     // Prepare data object
     const data = {
         name: document.getElementById('name').value,

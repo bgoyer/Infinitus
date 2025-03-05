@@ -3,17 +3,13 @@
  * Handles ship equipment configuration functionality
  */
 
-import { equipmentTypes, defaultEquipment } from './definitions.js';
-import { componentDatabase } from './component-data.js';
-import { updateJsonOutput } from './ui-manager.js';
-
 // Current equipment configuration state
 let currentEquipment = { ...defaultEquipment };
 
 /**
  * Reset equipment configuration to default
  */
-export function resetEquipment() {
+function resetEquipment() {
     currentEquipment = {
         thruster: '',
         turning: '',
@@ -29,7 +25,7 @@ export function resetEquipment() {
  * Get current equipment configuration
  * @returns {Object} - Current equipment configuration
  */
-export function getEquipment() {
+function getEquipment() {
     return { ...currentEquipment };
 }
 
@@ -37,7 +33,7 @@ export function getEquipment() {
  * Set equipment configuration
  * @param {Object} equipment - Equipment configuration to set
  */
-export function setEquipment(equipment) {
+function setEquipment(equipment) {
     if (!equipment) return;
     
     resetEquipment();
@@ -60,7 +56,7 @@ export function setEquipment(equipment) {
  * @param {Function} onChange - Callback for when equipment changes
  * @returns {HTMLElement} - Equipment selector element
  */
-export function createEquipmentSelector(onChange) {
+function createEquipmentSelector(onChange) {
     const container = document.createElement('div');
     container.className = 'form-group';
     
@@ -232,7 +228,7 @@ function renderWeapons(weaponsList, onChange) {
 /**
  * Update equipment selectors with current values
  */
-export function updateEquipmentSelectors() {
+function updateEquipmentSelectors() {
     // Update equipment select values
     equipmentTypes.forEach(eqType => {
         const selector = document.getElementById(`equipment-${eqType.id}`);
@@ -251,7 +247,7 @@ export function updateEquipmentSelectors() {
 /**
  * Rebuild equipment selectors after loading new component data
  */
-export function rebuildEquipmentSelectors() {
+function rebuildEquipmentSelectors() {
     // Update equipment selectors
     equipmentTypes.forEach(eqType => {
         const selector = document.getElementById(`equipment-${eqType.id}`);
@@ -292,7 +288,7 @@ export function rebuildEquipmentSelectors() {
  * Get equipment data for saving
  * @returns {Object|null} - Equipment data object or null if empty
  */
-export function getEquipmentData() {
+function getEquipmentData() {
     const equipment = {};
     
     // Add basic equipment if selected

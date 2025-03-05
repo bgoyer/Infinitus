@@ -4,7 +4,7 @@
  */
 
 // List of component file names to load
-export const defaultComponentFiles = [
+const defaultComponentFiles = [
     'ship.json',
     'capacitor.json', 
     'generator.json',
@@ -16,7 +16,7 @@ export const defaultComponentFiles = [
 ];
 
 // Equipment types for ship configuration
-export const equipmentTypes = [
+const equipmentTypes = [
     { id: 'thruster', label: 'Thruster' },
     { id: 'turning', label: 'Turning' },
     { id: 'capacitor', label: 'Capacitor' },
@@ -26,7 +26,7 @@ export const equipmentTypes = [
 ];
 
 // Field definitions for each component type
-export const fieldDefinitions = {
+const fieldDefinitions = {
     ship: {
         specific: [
             { id: 'max_velocity', label: 'Max Velocity', type: 'number', default: 1000 },
@@ -143,7 +143,7 @@ export const fieldDefinitions = {
 };
 
 // Default empty equipment configuration for ships
-export const defaultEquipment = {
+const defaultEquipment = {
     thruster: '',
     turning: '',
     capacitor: '',
@@ -154,13 +154,13 @@ export const defaultEquipment = {
 };
 
 // Default ship data for hardpoints
-export const defaultShipData = {
+const defaultShipData = {
     hardpoints: [],
     sprite: null
 };
 
 // Default sprite information
-export const defaultSpriteInfo = {
+const defaultSpriteInfo = {
     element: null,
     naturalWidth: 0,
     naturalHeight: 0,
