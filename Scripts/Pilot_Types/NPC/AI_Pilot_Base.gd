@@ -11,7 +11,7 @@ var aggressiveness: float = 0.5  # 0.0 to 1.0, affects flee threshold and attack
 var flee_health_threshold: float = 0.25  # Percentage of health that triggers fleeing
 var detection_range: float = 1000.0  # How far the AI can detect other ships
 var target: Ship = null  # Current target ship
-var home_planet: OrbitingBody = null  # Planet this AI considers "home" for landing
+var home_planet: Planet = null  # Planet this AI considers "home" for landing
 var patrol_points: Array[Vector2] = []  # Points to patrol between
 var current_patrol_index: int = 0
 var last_state_change_time: float = 0.0
@@ -26,7 +26,7 @@ var max_speed: float = 500.0  # Maximum speed for AI navigation
 # References
 var ship: Ship
 var visible_ships: Array[Ship] = []
-var visible_planets: Array[OrbitingBody] = []
+var visible_planets: Array[Planet] = []
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -234,13 +234,13 @@ func _face_position(target_position: Vector2, delta: float) -> void:
 func _on_body_entered(body: Node) -> void:
 	if body is Ship and body != ship:
 		visible_ships.append(body)
-	elif body is OrbitingBody:
+	elif body is Planet:
 		visible_planets.append(body)
 
 func _on_body_exited(body: Node) -> void:
 	if body is Ship:
 		visible_ships.erase(body)
-	elif body is OrbitingBody:
+	elif body is Planet:
 		visible_planets.erase(body)
 
 # Override from Pilot

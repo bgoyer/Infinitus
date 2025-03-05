@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3 uid="uid://dvu7xghrk3q6d"]
+
+[ext_resource type="Script" uid="uid://766qg1ktvky3" path="res://Scripts/Equipment/Weapon/BulletBase.gd" id="1_kxuvm"]
+[ext_resource type="Texture2D" uid="uid://ddmqt2fmd24l5" path="res://Images/Texture/Projectile/blaster+@2x.png" id="2_aam1j"]
+
+[node name="SmallCannonProjectile" type="Node2D"]
+script = ExtResource("1_kxuvm")
+metadata/_custom_type_script = "uid://766qg1ktvky3"
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_aam1j")

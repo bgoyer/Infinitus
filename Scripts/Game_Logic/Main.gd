@@ -2,12 +2,6 @@ extends Node2D
 
 var camera: PlayerCamera
 
-func _ready() -> void:
-	camera = get_camera()
-	load_scene()
-
-func load_scene() -> void:
-	camera.set_player(get_player())
 
 func get_camera() -> PlayerCamera:
 		for child in get_children():
@@ -22,7 +16,6 @@ func get_player() -> Player:
 				if map_item is Ship:
 					for ship_item in map_item.get_children():
 						if ship_item is Player:
-							ship_item.set_ship(map_item)
 							return ship_item
 							
 	return null

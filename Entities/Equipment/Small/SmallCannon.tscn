@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://bij8m4gfeyw76"]
+
+[ext_resource type="Texture2D" uid="uid://c0kukb6ufwiqa" path="res://Images/Texture/Hardpoint/mod blaster turret@2x.png" id="1_pf73y"]
+
+[node name="SmallCannon" type="Node2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_pf73y")

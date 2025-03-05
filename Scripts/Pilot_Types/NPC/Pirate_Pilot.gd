@@ -5,7 +5,7 @@ class_name PiratePilot
 var loot_value: int = 0  # Value of accumulated loot
 var max_loot_capacity: int = 1000  # Maximum loot before returning to base
 var has_pirate_base: bool = false  # Whether this pirate has a base to return to
-var pirate_base: OrbitingBody = null  # Planet serving as pirate base
+var pirate_base: Planet = null  # Planet serving as pirate base
 var ambush_position: Vector2 = Vector2.ZERO  # Position to set up ambush
 var is_setting_ambush: bool = false
 var ambush_timer: float = 0.0

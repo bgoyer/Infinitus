@@ -1,2 +1,2 @@
-extends OrbitingBody
+extends Planet
 class_name Red_Dwarf

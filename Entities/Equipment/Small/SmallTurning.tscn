@@ -4,3 +4,4 @@
 
 [node name="SmallTurning" type="Node2D"]
 script = ExtResource("1_y7x2d")
+metadata/_custom_type_script = "uid://c3fbydpkigykb"

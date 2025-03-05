@@ -14,7 +14,7 @@ var response_target: Ship = null
 var scan_interval: float = 5.0
 var last_scan_time: float = 0.0
 var aggressiveness: float = 0.7  # How eagerly police engage
-var station: OrbitingBody = null
+var station: Planet = null
 var has_station: bool = false
 
 func _init(target_fleet: Fleet) -> void:

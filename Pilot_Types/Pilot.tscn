@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://ce64w5p6s57m"]
+
+[ext_resource type="Script" uid="uid://cscplsb7koug4" path="res://Scripts/Pilot_Types/Pilot_Base.gd" id="1_0sqfb"]
+
+[node name="Pilot" type="Node2D"]
+script = ExtResource("1_0sqfb")
+metadata/_custom_type_script = "uid://cscplsb7koug4"

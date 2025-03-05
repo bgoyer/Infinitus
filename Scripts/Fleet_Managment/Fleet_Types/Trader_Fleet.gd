@@ -3,7 +3,7 @@ extends FactionFleetController
 class_name TraderFleetController
 
 # Trade route information
-var trade_route: Array[OrbitingBody] = []
+var trade_route: Array[Planet] = []
 var current_route_index: int = 0
 var trade_state: String = "traveling"  # traveling, docking, trading, undocking
 var docking_timer: float = 0.0
@@ -158,9 +158,9 @@ func _generate_trade_route() -> void:
 	var planets = get_tree().get_nodes_in_group("planets")
 	
 	# Filter for appropriate planets (could add more logic here)
-	var valid_planets: Array[OrbitingBody] = []
+	var valid_planets: Array[Planet] = []
 	for planet in planets:
-		if planet is OrbitingBody:
+		if planet is Planet:
 			valid_planets.append(planet)
 	
 	# Create a route with 2-4 planets

@@ -58,6 +58,8 @@ zoom_out={
 
 2d_physics/layer_1="Ships Planets Asteroids"
 2d_physics/layer_2="AI Detection"
+2d_physics/layer_3="Weapon_Shot"
+2d_physics/layer_32="Gravity"
 
 [rendering]
 

@@ -186,7 +186,7 @@ func _find_nearest_planet() -> void:
 		# This would be replaced with a more efficient planet registry system
 		var planets = get_tree().get_nodes_in_group("planets")
 		for planet in planets:
-			if planet is OrbitingBody:
+			if planet is Planet:
 				var dist = global_position.distance_to(planet.global_position)
 				if dist < nearest_dist:
 					nearest_dist = dist

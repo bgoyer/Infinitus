@@ -1,6 +1,14 @@
-[gd_scene load_steps=2 format=3 uid="uid://hmnsb75rccxe"]
+[gd_scene load_steps=4 format=3 uid="uid://hmnsb75rccxe"]
 
 [ext_resource type="Script" uid="uid://b13jwtmiq7wbl" path="res://Scripts/Pilot_Types/Player.gd" id="1_uji31"]
+[ext_resource type="Script" uid="uid://b5t8d3kebyjou" path="res://Scripts/UI/Indicator_Manager.gd" id="2_5i8cq"]
+[ext_resource type="PackedScene" uid="uid://c8jvr7qnu3xoq" path="res://UI/Object_Indicator.tscn" id="3_kyrmb"]
 
 [node name="Player" type="Node2D"]
 script = ExtResource("1_uji31")
+metadata/_custom_type_script = "uid://b13jwtmiq7wbl"
+
+[node name="Indicator_Manager" type="CanvasLayer" parent="."]
+script = ExtResource("2_5i8cq")
+indicator_scene = ExtResource("3_kyrmb")
+metadata/_custom_type_script = "uid://b5t8d3kebyjou"

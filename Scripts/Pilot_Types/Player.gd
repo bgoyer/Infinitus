@@ -31,7 +31,6 @@ func _ready() -> void:
 	background = get_node_or_null("Camera2D/Background")
 	nebula = get_node_or_null("Camera2D/Nubula")
 	dust = get_node_or_null("Camera2D/Dust")
-	
 	# Make sure input processing is enabled
 	set_process_input(true)
 	
@@ -201,9 +200,6 @@ func zoom_out() -> void:
 		camera.zoom.x -= .01
 		camera.zoom.y -= .01
 
-func set_camera(new_camera: Camera2D) -> void:
-	camera = new_camera
-
 func set_ship(new_ship: Ship) -> void:
 	ship = new_ship
 	print(ship)
@@ -359,9 +355,12 @@ func show_command_feedback(text: String) -> void:
 	show_ui_feedback = true
 	ui_feedback_timer = 0.0
 
-##func _draw() -> void:
+func set_camera(new_camera: Camera2D) -> void:
+	camera = new_camera
+
+func _draw() -> void:
 	# Draw UI feedback if active
-	#if show_ui_feedback:
-	#	var font_color = Color(1, 1, 1, 1 - (ui_feedback_timer / ui_feedback_duration))
-	#	draw_string(get_font("font", "Label"), Vector2(10, 40), ui_feedback_text, 
-	#			   font_color, 400)
+	if show_ui_feedback:
+		var font_color = Color(1, 1, 1, 1 - (ui_feedback_timer / ui_feedback_duration))
+		draw_string(SystemFont.new(), Vector2(10, 40), ui_feedback_text, 
+				   font_color, 400)

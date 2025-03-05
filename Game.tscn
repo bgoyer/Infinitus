@@ -1,8 +1,13 @@
-[gd_scene load_steps=4 format=3 uid="uid://bjqi5jfx3uqn2"]
+[gd_scene load_steps=9 format=3 uid="uid://bjqi5jfx3uqn2"]
 
 [ext_resource type="Script" uid="uid://bmr2vonakp6pg" path="res://Scripts/Game_Logic/Main.gd" id="1_5pvsq"]
 [ext_resource type="PackedScene" uid="uid://dkpttwdi7lqhe" path="res://Envioment/Maps/Test.tscn" id="1_imfbu"]
 [ext_resource type="PackedScene" uid="uid://vkhxcudl5joq" path="res://Entities/Player/Camera2D.tscn" id="3_eol6p"]
+[ext_resource type="Script" uid="uid://dgthfu4sqoja0" path="res://test.gd" id="4_sb48q"]
+[ext_resource type="PackedScene" uid="uid://dhnmap04c534h" path="res://Entities/Ships/Frigates/Sparrow.tscn" id="5_joorw"]
+[ext_resource type="PackedScene" uid="uid://veoeg50vn04f" path="res://Pilot_Types/Trader_Pilot.tscn" id="6_2vekm"]
+[ext_resource type="PackedScene" uid="uid://dxpq7hfk7if5b" path="res://Pilot_Types/Police_Pilot.tscn" id="7_yx171"]
+[ext_resource type="PackedScene" uid="uid://cbe8r8kpf13t3" path="res://Pilot_Types/Pirate_Pilot.tscn" id="8_yhmtn"]
 
 [node name="Game" type="Node2D"]
 script = ExtResource("1_5pvsq")
@@ -10,3 +15,10 @@ script = ExtResource("1_5pvsq")
 [node name="Test" parent="." instance=ExtResource("1_imfbu")]
 
 [node name="Camera2D" parent="." instance=ExtResource("3_eol6p")]
+
+[node name="Node2D" type="Node2D" parent="."]
+script = ExtResource("4_sb48q")
+frigate_scene = ExtResource("5_joorw")
+trader_pilot_scene = ExtResource("6_2vekm")
+police_pilot_scene = ExtResource("7_yx171")
+pirate_pilot_scene = ExtResource("8_yhmtn")
