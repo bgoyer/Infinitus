@@ -61,12 +61,23 @@ document.addEventListener('DOMContentLoaded', () => {
         );
     });
     
+    // Initialize sprite functionality
+    initializeSpriteFunctionality();
+    
     // Handle component type change
     componentTypeSelect.addEventListener('change', () => {
         const newType = componentTypeSelect.value;
         setCurrentSelection(newType, '');
         updateTypeSpecificFields();
         updateItemList(newType, (id) => loadComponentData(id));
+        
+        // Add sprite selector to form if we have sprites and this is a ship
+        if (newType === 'ship') {
+            setTimeout(() => {
+                const currentId = document.getElementById('itemId').value;
+                addSpriteFieldToShipForm(currentId);
+            }, 100);
+        }
     });
     
     // Save component button
@@ -261,6 +272,11 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Rebuild hardpoint editor
             recreateHardpointEditor();
+            
+            // Add sprite selector
+            setTimeout(() => {
+                addSpriteFieldToShipForm(id);
+            }, 100);
         }
         
         // Special handling for weapon subtypes
@@ -342,6 +358,174 @@ document.addEventListener('DOMContentLoaded', () => {
     updateTypeSpecificFields();
 });
 
+/**
+ * Add sprite loading functionality to the app
+ */
+function initializeSpriteFunctionality() {
+    // Create button for loading sprites
+    const loadSpritesBtn = document.createElement('button');
+    loadSpritesBtn.id = 'loadSpritesBtn';
+    loadSpritesBtn.textContent = 'Load Ship Sprites';
+    loadSpritesBtn.style.marginLeft = '10px';
+    
+    // Add event listener
+    loadSpritesBtn.addEventListener('click', () => {
+        handleSpriteFolderSelection((files) => {
+            showProgressLoadingScreen(files.length, 'sprites');
+            
+            loadSpriteFiles(
+                files,
+                // Progress callback
+                (processed, total) => {
+                    updateProgressBar(processed, total);
+                },
+                // Complete callback
+                (loadedSprites) => {
+                    hideProgressLoadingScreen();
+                    
+                    // Show success message
+                    const message = `Successfully loaded ${loadedSprites.length} sprites`;
+                    alert(message);
+                    
+                    // If on ship type, refresh the hardpoint editor
+                    const componentType = document.getElementById('componentType');
+                    if (componentType && componentType.value === 'ship') {
+                        recreateHardpointEditor();
+                    }
+                }
+            );
+        });
+    });
+    
+    // Add to header
+    const addSpritesButtonToHeader = () => {
+        const headerContainer = document.querySelector('.header > div');
+        if (headerContainer && !document.getElementById('loadSpritesBtn')) {
+            headerContainer.appendChild(loadSpritesBtn);
+        }
+    };
+    
+    // Add to header if editor is already visible
+    if (document.querySelector('.editor-container').style.display !== 'none') {
+        addSpritesButtonToHeader();
+    }
+    
+    // Add to initial loading screen if present
+    const initialLoadContainer = document.getElementById('initialLoadContainer');
+    if (initialLoadContainer && !document.getElementById('initialLoadSpritesBtn')) {
+        const initialLoadSpritesBtn = document.createElement('button');
+        initialLoadSpritesBtn.id = 'initialLoadSpritesBtn';
+        initialLoadSpritesBtn.textContent = 'Load Ship Sprites First (Optional)';
+        initialLoadSpritesBtn.style.padding = '10px';
+        initialLoadSpritesBtn.style.marginTop = '10px';
+        initialLoadSpritesBtn.style.backgroundColor = '#94e2d5';
+        initialLoadSpritesBtn.style.color = '#1e1e2e';
+        
+        initialLoadSpritesBtn.addEventListener('click', () => {
+            handleSpriteFolderSelection((files) => {
+                showProgressLoadingScreen(files.length, 'sprites');
+                
+                loadSpriteFiles(
+                    files,
+                    // Progress callback
+                    (processed, total) => {
+                        updateProgressBar(processed, total);
+                    },
+                    // Complete callback
+                    (loadedSprites) => {
+                        hideProgressLoadingScreen();
+                        
+                        // Update message
+                        const initialLoadMessage = document.getElementById('initialLoadMessage');
+                        if (initialLoadMessage) {
+                            initialLoadMessage.innerHTML = '<h2>Sprites Loaded Successfully!</h2>' + 
+                                `<p>Loaded ${loadedSprites.length} sprite files.</p>` +
+                                '<p>Now please load your component files to get started.</p>' +
+                                '<p>You can select multiple JSON files at once.</p>' +
+                                '<p><strong>Expected files:</strong> ' + defaultComponentFiles.join(', ') + '</p>';
+                        }
+                    }
+                );
+            });
+        });
+        
+        const initialLoadButton = document.getElementById('initialLoadButton');
+        if (initialLoadButton) {
+            initialLoadContainer.insertBefore(initialLoadSpritesBtn, initialLoadButton);
+        } else {
+            initialLoadContainer.appendChild(initialLoadSpritesBtn);
+        }
+    }
+}
+
+/**
+ * Add sprite selector to a ship component form
+ * @param {string} shipId - Current ship ID
+ */
+function addSpriteFieldToShipForm(shipId) {
+    // Only proceed if we have sprites and we're on a ship component
+    if (getSpriteNames().length === 0 || document.getElementById('sprite-select')) {
+        return;
+    }
+    
+    // Find a good place to add the sprite selector
+    const specificTabContent = document.getElementById('specificTab');
+    if (!specificTabContent) return;
+    
+    // Create the sprite selector field
+    const formGroup = document.createElement('div');
+    formGroup.className = 'form-group';
+    
+    const label = document.createElement('label');
+    label.textContent = 'Ship Sprite:';
+    formGroup.appendChild(label);
+    
+    // Create sprite selector
+    const shipData = getComponent('ship', shipId);
+    let currentSpriteName = '';
+    
+    // Try to find matching sprite for this ship
+    if (shipData && shipData.sprite) {
+        const spriteNames = getSpriteNames();
+        for (const name of spriteNames) {
+            if (getSprite(name) === shipData.sprite) {
+                currentSpriteName = name;
+                break;
+            }
+        }
+    }
+    
+    // Create sprite select element
+    const spriteSelectorContainer = document.createElement('div');
+    createSpriteSelector(spriteSelectorContainer, currentSpriteName, (spriteName) => {
+        if (spriteName) {
+            const spriteData = getSprite(spriteName);
+            if (spriteData) {
+                // Update form data
+                const shipId = document.getElementById('itemId').value;
+                const shipData = getComponent('ship', shipId);
+                
+                if (shipData) {
+                    shipData.sprite = spriteData;
+                }
+                
+                // Update hardpoint editor if visible
+                if (document.getElementById('sprite-container')) {
+                    updateSpriteDisplay(spriteData);
+                }
+                
+                // Update JSON output
+                updateJsonOutput('ship', shipId);
+            }
+        }
+    });
+    
+    formGroup.appendChild(spriteSelectorContainer);
+    
+    // Add to the form at the top
+    specificTabContent.insertBefore(formGroup, specificTabContent.firstChild);
+}
+
 // Helper function to get component types
 function getComponentTypes() {
     return {
@@ -354,4 +538,122 @@ function getComponentTypes() {
         turning: 'Turning Systems',
         weapon: 'Weapons'
     };
+}
+
+/**
+ * Handle sprite folder selection with browser compatibility
+ * @param {Function} onFilesSelected - Callback when files are selected
+ */
+function handleSpriteFolderSelection(onFilesSelected) {
+    // Check if directory selection is supported
+    const input = document.createElement('input');
+    input.type = 'file';
+    
+    // Modern approach with directory selection
+    if ('webkitdirectory' in input || 'directory' in input) {
+        input.accept = 'image/*';
+        input.multiple = true;
+        input.webkitdirectory = true;
+        input.directory = true;
+        
+        input.onchange = e => {
+            if (e.target.files && e.target.files.length > 0) {
+                onFilesSelected(e.target.files);
+            }
+        };
+        
+        input.click();
+    } 
+    // Fallback to multiple file selection with a message
+    else {
+        // Show message about directory selection not being supported
+        const message = 'Directory selection is not supported in your browser. ' +
+                      'Please select multiple sprite image files instead.';
+        alert(message);
+        
+        input.accept = 'image/*';
+        input.multiple = true;
+        
+        input.onchange = e => {
+            if (e.target.files && e.target.files.length > 0) {
+                onFilesSelected(e.target.files);
+            }
+        };
+        
+        input.click();
+    }
+}
+
+/**
+ * Show better loading UI with progress bar
+ * @param {number} total - Total items to process
+ * @param {string} type - Type of items being processed
+ */
+function showProgressLoadingScreen(total, type = 'files') {
+    // Create or get loading container
+    let loadingContainer = document.getElementById('loading-progress-container');
+    
+    if (!loadingContainer) {
+        loadingContainer = document.createElement('div');
+        loadingContainer.id = 'loading-progress-container';
+        loadingContainer.className = 'loading-container';
+        
+        // Add to page
+        document.querySelector('.container').appendChild(loadingContainer);
+    }
+    
+    // Set content
+    loadingContainer.innerHTML = `
+        <h3>Loading ${type}</h3>
+        <p id="loading-progress-text">0/${total} ${type} processed</p>
+        <div class="loading-bar">
+            <div id="loading-progress-bar" class="loading-bar-progress"></div>
+        </div>
+        <p id="loading-status"></p>
+    `;
+    
+    // Show the container
+    loadingContainer.style.display = 'block';
+}
+
+/**
+ * Update the progress bar
+ * @param {number} current - Current progress
+ * @param {number} total - Total items
+ * @param {string} message - Optional status message
+ */
+function updateProgressBar(current, total, message = null) {
+    const progressText = document.getElementById('loading-progress-text');
+    const progressBar = document.getElementById('loading-progress-bar');
+    const statusElement = document.getElementById('loading-status');
+    
+    if (progressText && progressBar) {
+        // Update text
+        progressText.textContent = `${current}/${total} processed`;
+        
+        // Update progress bar
+        const percentage = (current / total) * 100;
+        progressBar.style.width = `${percentage}%`;
+        
+        // Update status message if provided
+        if (statusElement && message) {
+            statusElement.textContent = message;
+        }
+    }
+}
+
+/**
+ * Hide loading screen
+ */
+function hideProgressLoadingScreen() {
+    const loadingContainer = document.getElementById('loading-progress-container');
+    if (loadingContainer) {
+        // Fade out and remove
+        loadingContainer.style.opacity = '0';
+        loadingContainer.style.transition = 'opacity 0.5s ease';
+        
+        setTimeout(() => {
+            loadingContainer.remove();
+        }, 500);
+    }
 }

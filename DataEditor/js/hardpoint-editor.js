@@ -84,6 +84,45 @@ function createHardpointEditor(container) {
     editorContainer.className = 'hardpoint-editor';
     container.appendChild(editorContainer);
     
+    // Add sprite selector if we have sprites
+    if (getSpriteNames().length > 0) {
+        // Extract current sprite name from data URL if available
+        let currentSpriteName = '';
+        if (currentShipData.sprite) {
+            // Try to find matching sprite in database
+            const spriteNames = getSpriteNames();
+            for (const name of spriteNames) {
+                if (getSprite(name) === currentShipData.sprite) {
+                    currentSpriteName = name;
+                    break;
+                }
+            }
+        }
+        
+        // Create selector that updates the ship sprite when changed
+        createSpriteSelector(editorContainer, currentSpriteName, (spriteName) => {
+            if (spriteName) {
+                const spriteData = getSprite(spriteName);
+                if (spriteData) {
+                    // Update current ship data
+                    currentShipData.sprite = spriteData;
+                    
+                    // Update sprite in UI
+                    updateSpriteDisplay(spriteData);
+                }
+            } else {
+                // Clear sprite if none selected
+                currentShipData.sprite = null;
+                
+                // Update UI
+                const spriteContainer = document.getElementById('sprite-container');
+                if (spriteContainer) {
+                    resetSpriteContainer(spriteContainer);
+                }
+            }
+        });
+    }
+    
     // Create sprite upload section
     const spriteContainer = document.createElement('div');
     spriteContainer.className = 'sprite-container';
@@ -234,6 +273,93 @@ function createHardpointEditor(container) {
 }
 
 /**
+ * Update sprite display with new sprite data
+ * @param {string} spriteData - Sprite data URL
+ */
+function updateSpriteDisplay(spriteData) {
+    const spriteContainer = document.getElementById('sprite-container');
+    if (!spriteContainer) return;
+    
+    // Clear container
+    spriteContainer.innerHTML = '';
+    spriteContainer.classList.add('has-image');
+    
+    // Create image
+    const img = document.createElement('img');
+    img.src = spriteData;
+    img.id = 'sprite-image';
+    
+    img.onload = function() {
+        // Save sprite dimensions
+        spriteInfo.element = img;
+        spriteInfo.naturalWidth = img.naturalWidth;
+        spriteInfo.naturalHeight = img.naturalHeight;
+        spriteInfo.displayWidth = img.width;
+        spriteInfo.displayHeight = img.height;
+        
+        // Add hardpoint markers
+        renderHardpointMarkers();
+    };
+    
+    spriteContainer.appendChild(img);
+    
+    // Add file input back
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.id = 'sprite-file-input';
+    fileInput.accept = 'image/*';
+    fileInput.style.display = 'none';
+    fileInput.addEventListener('change', handleSpriteUpload);
+    spriteContainer.appendChild(fileInput);
+    
+    // Add upload button
+    const uploadButton = document.createElement('button');
+    uploadButton.className = 'sprite-upload-btn';
+    uploadButton.textContent = 'Change Sprite';
+    uploadButton.addEventListener('click', () => {
+        fileInput.click();
+    });
+    spriteContainer.appendChild(uploadButton);
+}
+
+/**
+ * Reset sprite container to empty state
+ * @param {HTMLElement} spriteContainer - Sprite container element
+ */
+function resetSpriteContainer(spriteContainer) {
+    spriteContainer.innerHTML = '';
+    spriteContainer.classList.remove('has-image');
+    
+    // Add placeholder
+    const placeholderText = document.createElement('div');
+    placeholderText.textContent = 'Drag & drop a sprite image or click to upload';
+    placeholderText.id = 'sprite-placeholder';
+    spriteContainer.appendChild(placeholderText);
+    
+    // Add upload button
+    const uploadButton = document.createElement('button');
+    uploadButton.className = 'sprite-upload-btn';
+    uploadButton.textContent = 'Upload Sprite';
+    uploadButton.id = 'sprite-upload-btn';
+    
+    uploadButton.addEventListener('click', () => {
+        const fileInput = document.getElementById('sprite-file-input');
+        if (fileInput) fileInput.click();
+    });
+    
+    spriteContainer.appendChild(uploadButton);
+    
+    // Add file input
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.id = 'sprite-file-input';
+    fileInput.accept = 'image/*';
+    fileInput.style.display = 'none';
+    fileInput.addEventListener('change', handleSpriteUpload);
+    spriteContainer.appendChild(fileInput);
+}
+
+/**
  * Initialize sprite and hardpoints from saved data
  */
 function initializeSpriteAndHardpoints() {
@@ -308,53 +434,38 @@ function handleSpriteFile(file) {
         // Store sprite data
         currentShipData.sprite = e.target.result;
         
+        // Add to sprite database
+        let spriteName = file.name.replace(/\.[^/.]+$/, "");
+        addSprite(spriteName, e.target.result);
+        
         // Update sprite in UI
-        const spriteContainer = document.getElementById('sprite-container');
-        if (spriteContainer) {
-            // Clear container
-            spriteContainer.innerHTML = '';
-            spriteContainer.classList.add('has-image');
+        updateSpriteDisplay(e.target.result);
+        
+        // Update sprite selector if it exists
+        const spriteSelect = document.getElementById('sprite-select');
+        if (spriteSelect) {
+            // Check if we already have this sprite
+            let optionExists = false;
+            for (let i = 0; i < spriteSelect.options.length; i++) {
+                if (spriteSelect.options[i].value === spriteName) {
+                    spriteSelect.value = spriteName;
+                    optionExists = true;
+                    break;
+                }
+            }
             
-            // Create image
-            const img = document.createElement('img');
-            img.src = e.target.result;
-            img.id = 'sprite-image';
-            
-            img.onload = function() {
-                // Save sprite dimensions
-                spriteInfo.element = img;
-                spriteInfo.naturalWidth = img.naturalWidth;
-                spriteInfo.naturalHeight = img.naturalHeight;
-                spriteInfo.displayWidth = img.width;
-                spriteInfo.displayHeight = img.height;
-                
-                // Add hardpoint markers
-                renderHardpointMarkers();
-            };
-            
-            spriteContainer.appendChild(img);
-            
-            // Add file input back
-            const fileInput = document.createElement('input');
-            fileInput.type = 'file';
-            fileInput.id = 'sprite-file-input';
-            fileInput.accept = 'image/*';
-            fileInput.style.display = 'none';
-            fileInput.addEventListener('change', handleSpriteUpload);
-            spriteContainer.appendChild(fileInput);
-            
-            // Add upload button
-            const uploadButton = document.createElement('button');
-            uploadButton.className = 'sprite-upload-btn';
-            uploadButton.textContent = 'Change Sprite';
-            uploadButton.addEventListener('click', () => {
-                fileInput.click();
-            });
-            spriteContainer.appendChild(uploadButton);
-            
-            // Update JSON output
-            updateJsonOutput();
+            // Add new option if needed
+            if (!optionExists) {
+                const option = document.createElement('option');
+                option.value = spriteName;
+                option.textContent = spriteName;
+                spriteSelect.appendChild(option);
+                spriteSelect.value = spriteName;
+            }
         }
+        
+        // Update JSON output
+        updateJsonOutput();
     };
     reader.readAsDataURL(file);
 }
@@ -512,6 +623,7 @@ function updateHardpointTable() {
  */
 function addHardpointMarker(id, x, y) {
     const spriteContainer = document.getElementById('sprite-container');
+    const spriteImage = document.getElementById('sprite-image');
     if (!spriteContainer || !spriteInfo.element) return;
     
     // Create marker
@@ -520,10 +632,14 @@ function addHardpointMarker(id, x, y) {
     marker.dataset.id = id;
     
     // Position marker
-    const displayX = (x / spriteInfo.naturalWidth) * spriteInfo.displayWidth;
-    const displayY = (y / spriteInfo.naturalHeight) * spriteInfo.displayHeight;
-    marker.style.left = `${displayX}px`;
-    marker.style.top = `${displayY}px`;
+    // Calculate the actual displayed size of the image
+    const rect = spriteImage.getBoundingClientRect();
+    const displayX = (x / spriteInfo.naturalWidth) * rect.width;
+    const displayY = (y / spriteInfo.naturalHeight) * rect.height;
+    
+    // Calculate position with respect to the container and accounting for the image's position
+    marker.style.left = `${spriteImage.offsetLeft + displayX}px`;
+    marker.style.top = `${spriteImage.offsetTop + displayY}px`;
     
     // Label with ID
     marker.title = `Hardpoint ${id} (${x}, ${y})`;
@@ -572,8 +688,8 @@ function addHardpointMarker(id, x, y) {
             const y = e.clientY - rect.top;
             
             // Convert to sprite coordinates
-            const spriteX = Math.round((x / spriteInfo.displayWidth) * spriteInfo.naturalWidth);
-            const spriteY = Math.round((y / spriteInfo.displayHeight) * spriteInfo.naturalHeight);
+            const spriteX = Math.round((x / rect.width) * spriteInfo.naturalWidth);
+            const spriteY = Math.round((y / rect.height) * spriteInfo.naturalHeight);
             
             // Update data
             const hardpoint = currentShipData.hardpoints.find(h => h.id === markerId);
@@ -594,30 +710,34 @@ function addHardpointMarker(id, x, y) {
     }
 }
 
+
 /**
  * Update position of a hardpoint marker
  * @param {number} id - Hardpoint ID
  */
 function updateHardpointMarkerPosition(id) {
     const marker = document.querySelector(`.hardpoint-marker[data-id="${id}"]`);
-    if (!marker) return;
+    const spriteImage = document.getElementById('sprite-image');
+    if (!marker || !spriteImage) return;
     
     // Find hardpoint data
     const hardpoint = currentShipData.hardpoints.find(h => h.id === id);
     if (!hardpoint) return;
     
+    // Get the actual displayed size of the image
+    const rect = spriteImage.getBoundingClientRect();
+    
     // Calculate display position
-    const displayX = (hardpoint.x / spriteInfo.naturalWidth) * spriteInfo.displayWidth;
-    const displayY = (hardpoint.y / spriteInfo.naturalHeight) * spriteInfo.displayHeight;
+    const displayX = (hardpoint.x / spriteInfo.naturalWidth) * rect.width;
+    const displayY = (hardpoint.y / spriteInfo.naturalHeight) * rect.height;
     
     // Update marker position
-    marker.style.left = `${displayX}px`;
-    marker.style.top = `${displayY}px`;
+    marker.style.left = `${spriteImage.offsetLeft + displayX}px`;
+    marker.style.top = `${spriteImage.offsetTop + displayY}px`;
     
     // Update tooltip
     marker.title = `Hardpoint ${id} (${hardpoint.x}, ${hardpoint.y})`;
 }
-
 /**
  * Render all hardpoint markers
  */

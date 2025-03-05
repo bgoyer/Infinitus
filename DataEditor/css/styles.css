@@ -335,3 +335,56 @@ button:hover {
     border: none;
     border-radius: 4px;
 }
+
+/* Add to styles.css */
+.sprite-selector-container {
+    margin: 15px 0;
+    padding: 10px;
+    background-color: #2a2a3e;
+    border-radius: 4px;
+}
+
+.sprite-selector-container select {
+    background-color: #1e1e2e;
+    color: #cdd6f4;
+    padding: 8px;
+    border: 1px solid #45475a;
+    border-radius: 4px;
+    margin-left: 10px;
+}
+
+.sprite-preview {
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin-right: 10px;
+    vertical-align: middle;
+    border: 1px solid #45475a;
+}
+
+/* Sprite loading progress */
+.loading-container {
+    padding: 20px;
+    background-color: #313244;
+    border-radius: 8px;
+    text-align: center;
+    margin: 20px 0;
+}
+
+.loading-bar {
+    height: 8px;
+    background-color: #45475a;
+    border-radius: 4px;
+    margin: 10px 0;
+    overflow: hidden;
+}
+
+.loading-bar-progress {
+    height: 100%;
+    background-color: #89b4fa;
+    width: 0%;
+    transition: width 0.3s ease;
+}
