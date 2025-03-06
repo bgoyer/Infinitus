@@ -28,7 +28,6 @@ var can_target_ships: bool = true
 # References
 var muzzle_position: Marker2D  # Actual firing point
 var visual_model: Node2D  # Visual representation of the weapon
-
 # Signals
 signal weapon_fired(projectile_instance)
 signal ammo_depleted
@@ -39,7 +38,6 @@ func _ready() -> void:
 	add_to_group("Weapons")
 	muzzle_position = $MuzzlePosition
 	visual_model = $VisualModel
-	
 	# Initialize with max ammo
 	if ammo_capacity > 0:
 		ammo_count = ammo_capacity

@@ -1,9 +1,7 @@
-[gd_scene load_steps=6 format=3 uid="uid://dkpttwdi7lqhe"]
+[gd_scene load_steps=4 format=3 uid="uid://dkpttwdi7lqhe"]
 
 [ext_resource type="PackedScene" uid="uid://bptcijtpjebdy" path="res://Entities/Planets/Planet 1.tscn" id="1_f5ltm"]
-[ext_resource type="PackedScene" uid="uid://hmnsb75rccxe" path="res://Pilot_Types/Player_Pilot.tscn" id="1_fnsft"]
 [ext_resource type="Script" uid="uid://ldm6oh2abnid" path="res://Scripts/Map_Base.gd" id="1_uhbnl"]
-[ext_resource type="PackedScene" uid="uid://dhnmap04c534h" path="res://Entities/Ships/Frigates/Sparrow.tscn" id="2_tibu0"]
 [ext_resource type="PackedScene" uid="uid://b23rdcswl4tdp" path="res://Entities/Stars/Star1.tscn" id="6_a3vqt"]
 
 [node name="Test" type="Node2D"]
@@ -19,8 +17,3 @@ rotation_speed = 60.0
 
 [node name="Star1" parent="." instance=ExtResource("6_a3vqt")]
 scale = Vector2(10, 10)
-
-[node name="Sparrow" parent="." instance=ExtResource("2_tibu0")]
-position = Vector2(9000, 4500)
-
-[node name="Player" parent="Sparrow" instance=ExtResource("1_fnsft")]

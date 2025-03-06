@@ -1,12 +1,12 @@
 extends Camera2D
 class_name PlayerCamera
 
-var player
 var background: Polygon2D
 var nebula_level_1: Polygon2D
 var nebula_level_2: Polygon2D
 var nebula_level_3: Polygon2D
 var dust: Polygon2D
+var player: Player
 
 func _ready() -> void:
 	background = $Background
@@ -14,12 +14,12 @@ func _ready() -> void:
 	nebula_level_2 = $Nubula_Level_2
 	nebula_level_3 = $Nubula_Level_3
 	dust = $Dust
-	player = get_tree().root.get_node("Game").get_player()
-	player.set_camera(self)
+	player = GameManagerInstance.player
 
 func _process(delta: float) -> void:
 	if player:
 		global_position = player.global_position
+
 	if background:
 		background.texture_offset = Vector2(0, 0) + (self.global_position / 2000)
 

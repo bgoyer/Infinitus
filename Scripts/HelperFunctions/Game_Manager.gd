@@ -4,6 +4,8 @@ class_name GameManager
 # Singleton instance
 static var instance: GameManager
 
+var game_scene: Node2D 
+
 # Core systems
 var error_handler: ErrorHandler
 var scene_manager: SceneManager
@@ -11,6 +13,7 @@ var resource_manager: ResourceManager
 var physics_optimizer: PhysicsOptimizer
 var item_data_system: ItemDataSystem
 var ai_factory: AIFactory
+var scene_builder: SceneBuilder
 # Performance monitoring
 var fps_tracker: Array = []
 var frame_times: Array = []
@@ -31,6 +34,7 @@ var auto_optimization: bool = true
 # Player reference
 var player: Player
 var player_ship: Ship
+var player_camera: PlayerCamera
 
 signal performance_report_generated(report)
 
@@ -53,6 +57,8 @@ func _ready() -> void:
 	
 	# Start performance monitoring
 	set_process(true)
+	
+	
 
 func _process(delta: float) -> void:
 	# Track FPS for performance monitoring
@@ -90,6 +96,16 @@ func _process(delta: float) -> void:
 	if auto_optimization:
 		_auto_optimize(delta)
 
+func _initialize_player():
+	player = Player.new()
+	player_camera = PlayerCamera.new()
+	game_scene.add_child(player_camera)
+	
+	## Change this to let the player choose thier starter ship
+	player_ship = item_data_system.create_ship("fighter_basic")
+	player_ship.add_child(player)
+	game_scene.get_node("Test").add_child(player_ship)
+
 # Initialize all core systems
 func _initialize_systems() -> void:
 	# Create ErrorHandler
@@ -114,6 +130,11 @@ func _initialize_systems() -> void:
 	
 	ai_factory = AIFactory.new()
 	add_child(ai_factory)
+	
+	scene_builder = SceneBuilder.new()
+	add_child(scene_builder)
+	
+	_initialize_player()
 	
 	# Set initial quality settings
 	_apply_quality_settings()
