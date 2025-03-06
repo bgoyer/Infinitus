@@ -3,7 +3,7 @@
  * Styles for the Spaceship Component Editor
  */
 
-body {
+ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     padding: 20px;
@@ -229,7 +229,7 @@ button:hover {
 }
 
 /* Hardpoint Editor Styles */
-.hardpoint-editor {
+.hardpoint-editor, .engine-point-editor {
     display: flex;
     flex-direction: column;
     gap: 15px;
@@ -273,28 +273,58 @@ button:hover {
     transform: translate(-50%, -50%);
     cursor: pointer;
     z-index: 10;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
 }
 
-.hardpoint-controls {
+.hardpoint-marker.weapon-assigned {
+    background-color: #a6e3a1; /* Green for weapon assigned */
+    width: 12px;
+    height: 12px;
+    border: 1px solid #89b4fa;
+}
+
+.engine-point-marker {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #fab387; /* Orange for engine points */
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    z-index: 10;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+}
+
+.engine-point-marker.particles-enabled {
+    background-color: #f9e2af; /* Yellow for particles enabled */
+    width: 12px;
+    height: 12px;
+    border: 1px solid #fab387;
+}
+
+.hardpoint-controls, .engine-point-controls {
     display: flex;
     gap: 10px;
     align-items: center;
     margin-bottom: 10px;
 }
 
-.hardpoint-table {
+.hardpoint-table, .engine-point-table {
     width: 100%;
     border-collapse: collapse;
 }
 
 .hardpoint-table th, 
-.hardpoint-table td {
+.hardpoint-table td,
+.engine-point-table th,
+.engine-point-table td {
     padding: 8px;
     text-align: left;
     border-bottom: 1px solid #45475a;
 }
 
-.hardpoint-table th {
+.hardpoint-table th,
+.engine-point-table th {
     background-color: #2a2a3e;
 }
 
@@ -387,4 +417,129 @@ button:hover {
     background-color: #89b4fa;
     width: 0%;
     transition: width 0.3s ease;
+}
+
+/* Collision Shape Editor Styles */
+.collision-shape-editor {
+    background-color: #2a2a3e;
+    border-radius: 4px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.collision-shape-preview-container {
+    margin-top: 15px;
+    text-align: center;
+}
+
+.collision-shape-preview {
+    width: 250px;
+    height: 250px;
+    background-color: #1e1e2e;
+    border: 1px solid #45475a;
+    border-radius: 4px;
+    margin: 10px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.preview-shape {
+    border: 2px solid #89b4fa;
+}
+
+.preview-shape.rectangle {
+    background-color: rgba(137, 180, 250, 0.2);
+}
+
+.preview-shape.circle {
+    background-color: rgba(137, 180, 250, 0.2);
+}
+
+/* Position Editor Styles */
+.position-editor {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.position-editor input {
+    width: 60px;
+    text-align: center;
+}
+
+.position-label {
+    display: inline-block;
+    width: 20px;
+    text-align: center;
+    font-weight: bold;
+    color: #b4befe;
+}
+
+/* Resistances Editor Styles */
+.resistances-editor {
+    background-color: #2a2a3e;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 15px;
+}
+
+.resistance-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.resistance-label {
+    width: 120px;
+    font-weight: bold;
+}
+
+.resistance-value {
+    width: 60px;
+    margin-right: 10px;
+}
+
+/* Engine point editor tab */
+#enginePointsTab {
+    padding-top: 10px;
+}
+
+/* Engine sprite reference message */
+.engine-sprite-reference {
+    background-color: #2a2a3e;
+    border-radius: 4px;
+    padding: 15px;
+    margin-bottom: 15px;
+    text-align: center;
+    border: 1px dashed #45475a;
+}
+
+/* Update collision shape preview to have a fixed size and better positioning */
+.collision-shape-preview {
+    width: 250px;
+    height: 250px;
+    background-color: #1e1e2e;
+    border: 1px solid #45475a;
+    border-radius: 4px;
+    margin: 10px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+/* Improve preview shapes */
+.preview-shape {
+    border: 2px solid rgba(137, 180, 250, 0.7);
+    background-color: rgba(137, 180, 250, 0.2);
+    box-shadow: 0 0 10px rgba(137, 180, 250, 0.3);
+    z-index: 10;
+}
+
+/* Make shape container visible with background image context */
+.collision-shape-bg-image {
+    z-index: 1;
+    max-width: 100%;
+    max-height: 100%;
 }

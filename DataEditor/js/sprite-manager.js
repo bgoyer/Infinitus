@@ -1,3 +1,8 @@
+/**
+ * sprite-manager.js
+ * Manages loading and storage of ship sprites
+ */
+
 // Store for all loaded ship sprites
 let spriteDatabase = {};
 

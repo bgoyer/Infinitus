@@ -6,6 +6,7 @@
 // Current ship data for hardpoints
 let currentShipData = {
     hardpoints: [],
+    engine_points: [],
     sprite: null
 };
 
@@ -27,6 +28,7 @@ let spriteInfo = {
 function resetShipData() {
     currentShipData = {
         hardpoints: [],
+        engine_points: [],
         sprite: null
     };
     
@@ -67,6 +69,11 @@ function setShipData(data) {
     // Copy hardpoints if available
     if (data.hardpoints && Array.isArray(data.hardpoints)) {
         currentShipData.hardpoints = [...data.hardpoints];
+    }
+    
+    // Copy engine points if available
+    if (data.engine_points && Array.isArray(data.engine_points)) {
+        currentShipData.engine_points = [...data.engine_points];
     }
 }
 
@@ -186,7 +193,7 @@ function createHardpointEditor(container) {
     const headerRow = document.createElement('tr');
     thead.appendChild(headerRow);
     
-    ['ID', 'X Position', 'Y Position', 'Actions'].forEach(headerText => {
+    ['ID', 'X Position', 'Y Position', 'Weapon', 'Actions'].forEach(headerText => {
         const th = document.createElement('th');
         th.textContent = headerText;
         headerRow.appendChild(th);
@@ -299,6 +306,11 @@ function updateSpriteDisplay(spriteData) {
         
         // Add hardpoint markers
         renderHardpointMarkers();
+        
+        // Add engine point markers if they exist
+        if (typeof renderEnginePointMarkers === 'function') {
+            renderEnginePointMarkers();
+        }
     };
     
     spriteContainer.appendChild(img);
@@ -379,6 +391,11 @@ function initializeSpriteAndHardpoints() {
             
             // Add hardpoint markers
             renderHardpointMarkers();
+            
+            // Add engine point markers if they exist
+            if (typeof renderEnginePointMarkers === 'function') {
+                renderEnginePointMarkers();
+            }
         };
         
         // Add to container
@@ -475,8 +492,9 @@ function handleSpriteFile(file) {
  * @param {number} x - X coordinate
  * @param {number} y - Y coordinate
  * @param {number|null} id - Optional hardpoint ID
+ * @param {string|null} weaponId - Optional weapon ID
  */
-function addHardpoint(x, y, id = null) {
+function addHardpoint(x, y, id = null, weaponId = null) {
     if (!currentShipData.hardpoints) {
         currentShipData.hardpoints = [];
     }
@@ -487,12 +505,23 @@ function addHardpoint(x, y, id = null) {
             Math.max(...currentShipData.hardpoints.map(h => h.id)) + 1 : 1;
     }
     
+    // Create hardpoint object with position as an object
+    const hardpoint = {
+        id,
+        position: { x, y }
+    };
+    
+    // Add weapon_id if provided
+    if (weaponId) {
+        hardpoint.weapon_id = weaponId;
+    }
+    
     // Add hardpoint to array
-    currentShipData.hardpoints.push({ id, x, y });
+    currentShipData.hardpoints.push(hardpoint);
     
     // Update UI
     updateHardpointTable();
-    addHardpointMarker(id, x, y);
+    addHardpointMarker(id, x, y, weaponId);
 }
 
 /**
@@ -504,6 +533,9 @@ function updateHardpointTable() {
     
     // Clear table
     tbody.innerHTML = '';
+    
+    // Get list of available weapons
+    const weapons = getComponentsOfType('weapon');
     
     // Add rows for each hardpoint
     if (currentShipData.hardpoints && currentShipData.hardpoints.length > 0) {
@@ -540,14 +572,15 @@ function updateHardpointTable() {
             const xCell = document.createElement('td');
             const xInput = document.createElement('input');
             xInput.type = 'number';
-            xInput.value = hardpoint.x || 0;
+            xInput.value = hardpoint.position?.x !== undefined ? hardpoint.position.x : 0;
             xInput.style.width = '80px';
             
             xInput.addEventListener('change', () => {
                 const newX = parseInt(xInput.value) || 0;
                 
                 // Update position in data
-                hardpoint.x = newX;
+                if (!hardpoint.position) hardpoint.position = { x: 0, y: 0 };
+                hardpoint.position.x = newX;
                 
                 // Update marker position
                 updateHardpointMarkerPosition(hardpoint.id);
@@ -561,14 +594,15 @@ function updateHardpointTable() {
             const yCell = document.createElement('td');
             const yInput = document.createElement('input');
             yInput.type = 'number';
-            yInput.value = hardpoint.y || 0;
+            yInput.value = hardpoint.position?.y !== undefined ? hardpoint.position.y : 0;
             yInput.style.width = '80px';
             
             yInput.addEventListener('change', () => {
                 const newY = parseInt(yInput.value) || 0;
                 
                 // Update position in data
-                hardpoint.y = newY;
+                if (!hardpoint.position) hardpoint.position = { x: 0, y: 0 };
+                hardpoint.position.y = newY;
                 
                 // Update marker position
                 updateHardpointMarkerPosition(hardpoint.id);
@@ -577,6 +611,60 @@ function updateHardpointTable() {
             });
             
             yCell.appendChild(yInput);
+            
+            // Weapon selection cell
+            const weaponCell = document.createElement('td');
+            const weaponSelect = document.createElement('select');
+            weaponSelect.style.width = '100%';
+            
+            // Add empty option
+            const emptyOption = document.createElement('option');
+            emptyOption.value = '';
+            emptyOption.textContent = '-- None --';
+            weaponSelect.appendChild(emptyOption);
+            
+            // Add weapon options
+            for (const weaponId in weapons) {
+                const weapon = weapons[weaponId];
+                const option = document.createElement('option');
+                option.value = weaponId;
+                option.textContent = weapon.name || weaponId;
+                weaponSelect.appendChild(option);
+            }
+            
+            // Set current weapon
+            weaponSelect.value = hardpoint.weapon_id || '';
+            
+            // Handle weapon change
+            weaponSelect.addEventListener('change', () => {
+                const weaponId = weaponSelect.value;
+                
+                if (weaponId) {
+                    hardpoint.weapon_id = weaponId;
+                } else {
+                    delete hardpoint.weapon_id;
+                }
+                
+                // Update marker appearance
+                const marker = document.querySelector(`.hardpoint-marker[data-id="${hardpoint.id}"]`);
+                if (marker) {
+                    if (weaponId) {
+                        marker.classList.add('weapon-assigned');
+                        
+                        // Update tooltip with weapon info
+                        const weapon = weapons[weaponId];
+                        const weaponName = weapon ? weapon.name || weaponId : weaponId;
+                        marker.title = `Hardpoint ${hardpoint.id} (${hardpoint.position?.x || 0}, ${hardpoint.position?.y || 0}) - ${weaponName}`;
+                    } else {
+                        marker.classList.remove('weapon-assigned');
+                        marker.title = `Hardpoint ${hardpoint.id} (${hardpoint.position?.x || 0}, ${hardpoint.position?.y || 0})`;
+                    }
+                }
+                
+                updateJsonOutput();
+            });
+            
+            weaponCell.appendChild(weaponSelect);
             
             // Actions cell
             const actionsCell = document.createElement('td');
@@ -607,6 +695,7 @@ function updateHardpointTable() {
             row.appendChild(idCell);
             row.appendChild(xCell);
             row.appendChild(yCell);
+            row.appendChild(weaponCell);
             row.appendChild(actionsCell);
             
             // Add row to table
@@ -620,8 +709,9 @@ function updateHardpointTable() {
  * @param {number} id - Hardpoint ID
  * @param {number} x - X coordinate
  * @param {number} y - Y coordinate
+ * @param {string|null} weaponId - Optional weapon ID
  */
-function addHardpointMarker(id, x, y) {
+function addHardpointMarker(id, x, y, weaponId = null) {
     const spriteContainer = document.getElementById('sprite-container');
     const spriteImage = document.getElementById('sprite-image');
     if (!spriteContainer || !spriteInfo.element) return;
@@ -630,6 +720,10 @@ function addHardpointMarker(id, x, y) {
     const marker = document.createElement('div');
     marker.className = 'hardpoint-marker';
     marker.dataset.id = id;
+    
+    if (weaponId) {
+        marker.classList.add('weapon-assigned');
+    }
     
     // Position marker
     // Calculate the actual displayed size of the image
@@ -641,8 +735,14 @@ function addHardpointMarker(id, x, y) {
     marker.style.left = `${spriteImage.offsetLeft + displayX}px`;
     marker.style.top = `${spriteImage.offsetTop + displayY}px`;
     
-    // Label with ID
-    marker.title = `Hardpoint ${id} (${x}, ${y})`;
+    // Label with ID and weapon if assigned
+    let title = `Hardpoint ${id} (${x}, ${y})`;
+    if (weaponId) {
+        const weapon = getComponent('weapon', weaponId);
+        const weaponName = weapon ? weapon.name || weaponId : weaponId;
+        title += ` - ${weaponName}`;
+    }
+    marker.title = title;
     
     // Make draggable
     marker.draggable = true;
@@ -650,7 +750,7 @@ function addHardpointMarker(id, x, y) {
     // Add event listeners for dragging
     marker.addEventListener('dragstart', (e) => {
         // Store initial position for calculations
-        e.dataTransfer.setData('text/plain', `${id},${marker.style.left},${marker.style.top}`);
+        e.dataTransfer.setData('text/plain', `hardpoint,${id},${marker.style.left},${marker.style.top}`);
         e.dataTransfer.effectAllowed = 'move';
         
         // Add some transparency during drag
@@ -667,8 +767,8 @@ function addHardpointMarker(id, x, y) {
     spriteContainer.appendChild(marker);
     
     // Make container a drop target for markers
-    if (!spriteContainer.hasAttribute('data-drop-initialized')) {
-        spriteContainer.setAttribute('data-drop-initialized', 'true');
+    if (!spriteContainer.hasAttribute('data-hardpoint-drop-initialized')) {
+        spriteContainer.setAttribute('data-hardpoint-drop-initialized', 'true');
         
         spriteContainer.addEventListener('dragover', (e) => {
             e.preventDefault();
@@ -678,38 +778,43 @@ function addHardpointMarker(id, x, y) {
         spriteContainer.addEventListener('drop', (e) => {
             e.preventDefault();
             
-            // Get ID of dragged marker
+            // Get data of dragged marker
             const data = e.dataTransfer.getData('text/plain').split(',');
-            const markerId = parseInt(data[0]);
+            const type = data[0];
             
-            // Calculate new position
-            const rect = spriteInfo.element.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            // Convert to sprite coordinates
-            const spriteX = Math.round((x / rect.width) * spriteInfo.naturalWidth);
-            const spriteY = Math.round((y / rect.height) * spriteInfo.naturalHeight);
-            
-            // Update data
-            const hardpoint = currentShipData.hardpoints.find(h => h.id === markerId);
-            if (hardpoint) {
-                hardpoint.x = spriteX;
-                hardpoint.y = spriteY;
+            // Only handle hardpoints in this handler
+            if (type === 'hardpoint') {
+                const markerId = parseInt(data[1]);
                 
-                // Update table
-                updateHardpointTable();
+                // Calculate new position
+                const rect = spriteInfo.element.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
                 
-                // Update marker position
-                updateHardpointMarkerPosition(markerId);
+                // Convert to sprite coordinates
+                const spriteX = Math.round((x / rect.width) * spriteInfo.naturalWidth);
+                const spriteY = Math.round((y / rect.height) * spriteInfo.naturalHeight);
                 
-                // Update JSON
-                updateJsonOutput();
+                // Update data
+                const hardpoint = currentShipData.hardpoints.find(h => h.id === markerId);
+                if (hardpoint) {
+                    if (!hardpoint.position) hardpoint.position = { x: 0, y: 0 };
+                    hardpoint.position.x = spriteX;
+                    hardpoint.position.y = spriteY;
+                    
+                    // Update table
+                    updateHardpointTable();
+                    
+                    // Update marker position
+                    updateHardpointMarkerPosition(markerId);
+                    
+                    // Update JSON
+                    updateJsonOutput();
+                }
             }
         });
     }
 }
-
 
 /**
  * Update position of a hardpoint marker
@@ -722,22 +827,29 @@ function updateHardpointMarkerPosition(id) {
     
     // Find hardpoint data
     const hardpoint = currentShipData.hardpoints.find(h => h.id === id);
-    if (!hardpoint) return;
+    if (!hardpoint || !hardpoint.position) return;
     
     // Get the actual displayed size of the image
     const rect = spriteImage.getBoundingClientRect();
     
     // Calculate display position
-    const displayX = (hardpoint.x / spriteInfo.naturalWidth) * rect.width;
-    const displayY = (hardpoint.y / spriteInfo.naturalHeight) * rect.height;
+    const displayX = (hardpoint.position.x / spriteInfo.naturalWidth) * rect.width;
+    const displayY = (hardpoint.position.y / spriteInfo.naturalHeight) * rect.height;
     
     // Update marker position
     marker.style.left = `${spriteImage.offsetLeft + displayX}px`;
     marker.style.top = `${spriteImage.offsetTop + displayY}px`;
     
     // Update tooltip
-    marker.title = `Hardpoint ${id} (${hardpoint.x}, ${hardpoint.y})`;
+    let title = `Hardpoint ${id} (${hardpoint.position.x}, ${hardpoint.position.y})`;
+    if (hardpoint.weapon_id) {
+        const weapon = getComponent('weapon', hardpoint.weapon_id);
+        const weaponName = weapon ? weapon.name || hardpoint.weapon_id : hardpoint.weapon_id;
+        title += ` - ${weaponName}`;
+    }
+    marker.title = title;
 }
+
 /**
  * Render all hardpoint markers
  */
@@ -748,7 +860,12 @@ function renderHardpointMarkers() {
     // Add markers for each hardpoint
     if (currentShipData.hardpoints && currentShipData.hardpoints.length > 0) {
         currentShipData.hardpoints.forEach(hardpoint => {
-            addHardpointMarker(hardpoint.id, hardpoint.x, hardpoint.y);
+            addHardpointMarker(
+                hardpoint.id, 
+                hardpoint.position?.x || 0, 
+                hardpoint.position?.y || 0,
+                hardpoint.weapon_id
+            );
         });
     }
 }

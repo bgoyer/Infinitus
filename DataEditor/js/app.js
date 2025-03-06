@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const specificTabContent = document.getElementById('specificTab');
     const advancedTabContent = document.getElementById('advancedTab');
     const hardpointsTabContent = document.getElementById('hardpointsTab');
+    const enginePointsTabContent = document.getElementById('enginePointsTab');
     
     const saveButton = document.getElementById('saveButton');
     const newButton = document.getElementById('newButton');
@@ -109,6 +110,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 data.hardpoints = hardpoints;
             }
             
+            // Add engine points if available
+            const enginePoints = getEnginePointData();
+            if (enginePoints) {
+                data.engine_points = enginePoints;
+            }
+            
             // Add equipment
             const equipment = getEquipmentData();
             if (equipment) {
@@ -141,6 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
             resetShipData();
             rebuildEquipmentSelectors();
             recreateHardpointEditor();
+            recreateEnginePointEditor();
         }
         
         updateJsonOutput(type);
@@ -195,10 +203,18 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Create hardpoint editor
             recreateHardpointEditor();
+            
+            // Create engine point editor
+            recreateEnginePointEditor();
+            
+            // Update collision shape preview with ship sprite
+            setTimeout(() => {
+                updateCollisionShapePreview();
+            }, 100);
         }
         
-        // Toggle hardpoints tab visibility
-        toggleHardpointsTab(type);
+        // Toggle special tabs visibility
+        toggleSpecialTabs(type);
         
         // Update JSON output
         updateJsonOutput(type);
@@ -208,8 +224,46 @@ document.addEventListener('DOMContentLoaded', () => {
     function recreateHardpointEditor() {
         // Clear and recreate hardpoint editor
         const type = getCurrentSelection().type || componentTypeSelect.value;
-        if (type === 'ship') {
+        if (type === 'ship' && hardpointsTabContent) {
             createHardpointEditor(hardpointsTabContent);
+        }
+    }
+    
+    // Function to recreate engine point editor
+    function recreateEnginePointEditor() {
+        // Clear and recreate engine point editor
+        const type = getCurrentSelection().type || componentTypeSelect.value;
+        if (type === 'ship' && enginePointsTabContent) {
+            createEnginePointEditor(enginePointsTabContent);
+        }
+    }
+    
+    // Function to toggle visibility of special tabs (hardpoints, engine points)
+    function toggleSpecialTabs(type) {
+        const hardpointsTab = document.querySelector('.tab-button[data-tab="hardpointsTab"]');
+        const enginePointsTab = document.querySelector('.tab-button[data-tab="enginePointsTab"]');
+        
+        if (hardpointsTab) {
+            hardpointsTab.style.display = type === 'ship' ? 'block' : 'none';
+        }
+        
+        if (enginePointsTab) {
+            enginePointsTab.style.display = type === 'ship' ? 'block' : 'none';
+        }
+        
+        // Show placeholder message in tabs for non-ship components
+        if (type !== 'ship') {
+            const tabContents = [hardpointsTabContent, enginePointsTabContent];
+            
+            tabContents.forEach(tab => {
+                if (tab) {
+                    tab.innerHTML = '';
+                    const notAvailableMessage = document.createElement('div');
+                    notAvailableMessage.className = 'centered-text';
+                    notAvailableMessage.textContent = 'This editor is only available for ship components.';
+                    tab.appendChild(notAvailableMessage);
+                }
+            });
         }
     }
     
@@ -246,6 +300,27 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
+        // Handle special fields like position, color, etc.
+        if (data.muzzle_position) {
+            setPositionFieldValues(data.muzzle_position);
+        }
+        
+        if (data.indicator_color) {
+            setColorFieldValues(data.indicator_color);
+        }
+        
+        if (data.shield_color) {
+            setColorFieldValues(data.shield_color);
+        }
+        
+        if (data.resistances) {
+            setResistancesFieldValues(data.resistances);
+        }
+        
+        if (data.collision_shape) {
+            setCollisionShapeData(data.collision_shape);
+        }
+        
         // Special handling for ship data
         if (type === 'ship') {
             // Reset ship data
@@ -255,7 +330,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.sprite) {
                 setShipData({
                     sprite: data.sprite,
-                    hardpoints: data.hardpoints || []
+                    hardpoints: data.hardpoints || [],
+                    engine_points: data.engine_points || []
+                });
+            } else {
+                setShipData({
+                    hardpoints: data.hardpoints || [],
+                    engine_points: data.engine_points || []
                 });
             }
             
@@ -273,10 +354,18 @@ document.addEventListener('DOMContentLoaded', () => {
             // Rebuild hardpoint editor
             recreateHardpointEditor();
             
+            // Rebuild engine point editor
+            recreateEnginePointEditor();
+            
             // Add sprite selector
             setTimeout(() => {
                 addSpriteFieldToShipForm(id);
             }, 100);
+            
+            // Update collision shape preview with ship sprite
+            setTimeout(() => {
+                updateCollisionShapePreview();
+            }, 200);
         }
         
         // Special handling for weapon subtypes
@@ -290,24 +379,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // Set type-specific fields
                 if (weaponType === 'gun' && data.spread_angle !== undefined) {
-                    const spreadAngle = document.getElementById('gun_spread_angle');
+                    const spreadAngle = document.getElementById('spread_angle');
                     if (spreadAngle) spreadAngle.value = data.spread_angle;
                 } else if (weaponType === 'turret') {
                     if (data.rotation_speed !== undefined) {
-                        const rotationSpeed = document.getElementById('turret_rotation_speed');
+                        const rotationSpeed = document.getElementById('rotation_speed');
                         if (rotationSpeed) rotationSpeed.value = data.rotation_speed;
                     }
                     if (data.aim_ahead_factor !== undefined) {
-                        const aimAhead = document.getElementById('turret_aim_ahead_factor');
+                        const aimAhead = document.getElementById('aim_ahead_factor');
                         if (aimAhead) aimAhead.value = data.aim_ahead_factor;
                     }
                     if (data.fire_arc !== undefined) {
-                        const fireArc = document.getElementById('turret_fire_arc');
+                        const fireArc = document.getElementById('fire_arc');
                         if (fireArc) fireArc.value = data.fire_arc;
                     }
                     if (data.base_inaccuracy !== undefined) {
-                        const baseInaccuracy = document.getElementById('turret_base_inaccuracy');
+                        const baseInaccuracy = document.getElementById('base_inaccuracy');
                         if (baseInaccuracy) baseInaccuracy.value = data.base_inaccuracy;
+                    }
+                    if (data.inaccuracy_from_movement !== undefined) {
+                        const inaccuracyFromMovement = document.getElementById('inaccuracy_from_movement');
+                        if (inaccuracyFromMovement) inaccuracyFromMovement.value = data.inaccuracy_from_movement;
                     }
                 } else if (weaponType === 'missile_launcher') {
                     if (data.missile_tracking_time !== undefined) {
@@ -331,8 +424,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (blastRadius) blastRadius.value = data.missile_blast_radius;
                     }
                     if (data.salvo_size !== undefined) {
-                        const salvoSize = document.getElementById('missile_salvo_size');
+                        const salvoSize = document.getElementById('salvo_size');
                         if (salvoSize) salvoSize.value = data.salvo_size;
+                    }
+                    if (data.salvo_delay !== undefined) {
+                        const salvoDelay = document.getElementById('salvo_delay');
+                        if (salvoDelay) salvoDelay.value = data.salvo_delay;
                     }
                 }
             }
@@ -391,6 +488,7 @@ function initializeSpriteFunctionality() {
                     const componentType = document.getElementById('componentType');
                     if (componentType && componentType.value === 'ship') {
                         recreateHardpointEditor();
+                        recreateEnginePointEditor();
                     }
                 }
             );
@@ -514,6 +612,14 @@ function addSpriteFieldToShipForm(shipId) {
                     updateSpriteDisplay(spriteData);
                 }
                 
+                // Update engine point editor if visible
+                if (document.getElementById('engine-sprite-container')) {
+                    updateSpriteDisplayForEngine(spriteData);
+                }
+                
+                // Update collision shape preview
+                updateCollisionShapePreview();
+                
                 // Update JSON output
                 updateJsonOutput('ship', shipId);
             }
@@ -526,18 +632,28 @@ function addSpriteFieldToShipForm(shipId) {
     specificTabContent.insertBefore(formGroup, specificTabContent.firstChild);
 }
 
-// Helper function to get component types
-function getComponentTypes() {
-    return {
-        ship: 'Ships',
-        capacitor: 'Capacitors',
-        generator: 'Generators',
-        shield: 'Shields',
-        armor: 'Armor',
-        thruster: 'Thrusters',
-        turning: 'Turning Systems',
-        weapon: 'Weapons'
-    };
+// Function to recreate hardpoint editor
+function recreateHardpointEditor() {
+    const hardpointsTabContent = document.getElementById('hardpointsTab');
+    if (hardpointsTabContent) {
+        // Clear and recreate hardpoint editor
+        const type = getCurrentSelection().type || document.getElementById('componentType').value;
+        if (type === 'ship') {
+            createHardpointEditor(hardpointsTabContent);
+        }
+    }
+}
+
+// Function to recreate engine point editor
+function recreateEnginePointEditor() {
+    const enginePointsTabContent = document.getElementById('enginePointsTab');
+    if (enginePointsTabContent) {
+        // Clear and recreate engine point editor
+        const type = getCurrentSelection().type || document.getElementById('componentType').value;
+        if (type === 'ship') {
+            createEnginePointEditor(enginePointsTabContent);
+        }
+    }
 }
 
 /**
@@ -656,4 +772,19 @@ function hideProgressLoadingScreen() {
             loadingContainer.remove();
         }, 500);
     }
+}
+
+// Helper function to get component types
+function getComponentTypes() {
+    return {
+        ship: 'Ships',
+        capacitor: 'Capacitors',
+        generator: 'Generators',
+        shield: 'Shields',
+        armor: 'Armor',
+        thruster: 'Thrusters',
+        turning: 'Turning Systems',
+        weapon: 'Weapons',
+        fleet: 'Fleets'
+    };
 }

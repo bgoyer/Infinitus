@@ -94,6 +94,123 @@ function createFormField(field) {
             input = colorInputs;
             break;
             
+        case 'position':
+            // Create position editor (x, y coordinates)
+            const positionContainer = document.createElement('div');
+            positionContainer.className = 'position-editor';
+            
+            const positionInputs = {};
+            
+            // X input
+            const xLabel = document.createElement('span');
+            xLabel.className = 'position-label';
+            xLabel.textContent = 'X:';
+            positionContainer.appendChild(xLabel);
+            
+            const xInput = document.createElement('input');
+            xInput.type = 'number';
+            xInput.value = field.default?.x || 0;
+            xInput.dataset.axis = 'x';
+            positionInputs.x = xInput;
+            positionContainer.appendChild(xInput);
+            
+            // Y input
+            const yLabel = document.createElement('span');
+            yLabel.className = 'position-label';
+            yLabel.textContent = 'Y:';
+            positionContainer.appendChild(yLabel);
+            
+            const yInput = document.createElement('input');
+            yInput.type = 'number';
+            yInput.value = field.default?.y || 0;
+            yInput.dataset.axis = 'y';
+            positionInputs.y = yInput;
+            positionContainer.appendChild(yInput);
+            
+            formGroup.appendChild(positionContainer);
+            
+            // Store inputs reference for later data retrieval
+            input = positionInputs;
+            break;
+            
+        case 'resistances':
+            // Create resistances editor for armor
+            const resistancesContainer = document.createElement('div');
+            resistancesContainer.className = 'resistances-editor';
+            
+            const resistanceTypes = [
+                { id: 'kinetic', label: 'Kinetic' },
+                { id: 'energy', label: 'Energy' },
+                { id: 'explosive', label: 'Explosive' },
+                { id: 'thermal', label: 'Thermal' }
+            ];
+            
+            const resistanceInputs = {};
+            
+            // Create fields for each resistance type
+            resistanceTypes.forEach(type => {
+                const row = document.createElement('div');
+                row.className = 'resistance-row';
+                
+                const label = document.createElement('span');
+                label.className = 'resistance-label';
+                label.textContent = type.label + ':';
+                row.appendChild(label);
+                
+                const resistanceInput = document.createElement('input');
+                resistanceInput.type = 'number';
+                resistanceInput.className = 'resistance-value';
+                resistanceInput.min = 0;
+                resistanceInput.step = 0.1;
+                resistanceInput.value = field.default?.[type.id] || 1.0;
+                resistanceInputs[type.id] = resistanceInput;
+                row.appendChild(resistanceInput);
+                
+                const effectLabel = document.createElement('span');
+                
+                // Update effect label based on value
+                const updateEffectLabel = () => {
+                    const value = parseFloat(resistanceInput.value);
+                    let effect;
+                    
+                    if (value < 1.0) {
+                        effect = 'Resistant';
+                        effectLabel.style.color = '#a6e3a1'; // Green for resistance
+                    } else if (value > 1.0) {
+                        effect = 'Vulnerable';
+                        effectLabel.style.color = '#f38ba8'; // Red for vulnerability
+                    } else {
+                        effect = 'Neutral';
+                        effectLabel.style.color = '#cdd6f4'; // Normal color for neutral
+                    }
+                    
+                    effectLabel.textContent = effect;
+                };
+                
+                resistanceInput.addEventListener('input', updateEffectLabel);
+                updateEffectLabel(); // Initial label
+                
+                row.appendChild(effectLabel);
+                resistancesContainer.appendChild(row);
+            });
+            
+            formGroup.appendChild(resistancesContainer);
+            
+            // Store inputs reference for later data retrieval
+            input = resistanceInputs;
+            break;
+            
+        case 'collisionShape':
+            // Create collision shape editor
+            const collisionShapeContainer = document.createElement('div');
+            const collisionShapeEditor = createCollisionShapeEditor(field.default);
+            collisionShapeContainer.appendChild(collisionShapeEditor);
+            formGroup.appendChild(collisionShapeContainer);
+            
+            // This field doesn't have a standard input
+            input = { type: 'collisionShape' };
+            break;
+            
         default: // text, number, etc.
             input = document.createElement('input');
             input.type = field.type || 'text';
@@ -102,11 +219,12 @@ function createFormField(field) {
             if (field.min !== undefined) input.min = field.min;
             if (field.max !== undefined) input.max = field.max;
             if (field.step !== undefined) input.step = field.step;
+            if (field.disabled !== undefined) input.disabled = field.disabled;
             break;
     }
     
     // Set common attributes
-    if (input.id !== undefined) { // For non-color fields
+    if (input.id !== undefined) { // For non-complex fields
         input.id = field.id;
         input.name = field.id;
         
@@ -220,6 +338,95 @@ function setColorFieldValues(colorData) {
 }
 
 /**
+ * Get position field values
+ * @param {string} fieldId - Base field ID
+ * @returns {Object} - Position object with x and y coordinates
+ */
+function getPositionFieldValues(fieldId) {
+    const positionData = { x: 0, y: 0 };
+    
+    const xInput = document.querySelector(`input[data-axis="x"]`);
+    const yInput = document.querySelector(`input[data-axis="y"]`);
+    
+    if (xInput) positionData.x = parseInt(xInput.value) || 0;
+    if (yInput) positionData.y = parseInt(yInput.value) || 0;
+    
+    return positionData;
+}
+
+/**
+ * Set position field values
+ * @param {Object} positionData - Position object with x and y coordinates
+ */
+function setPositionFieldValues(positionData) {
+    if (!positionData) return;
+    
+    const xInput = document.querySelector(`input[data-axis="x"]`);
+    const yInput = document.querySelector(`input[data-axis="y"]`);
+    
+    if (xInput) xInput.value = positionData.x || 0;
+    if (yInput) yInput.value = positionData.y || 0;
+}
+
+/**
+ * Get resistances field values
+ * @returns {Object} - Resistances object with resistance values by type
+ */
+function getResistancesFieldValues() {
+    const resistanceTypes = ['kinetic', 'energy', 'explosive', 'thermal'];
+    const resistances = {};
+    
+    resistanceTypes.forEach(type => {
+        const input = document.querySelector(`.resistance-row .resistance-value[data-type="${type}"]`);
+        if (input) {
+            resistances[type] = parseFloat(input.value) || 1.0;
+        } else {
+            // Try to find by traversing the DOM structure
+            const inputs = document.querySelectorAll('.resistance-value');
+            if (inputs.length > 0) {
+                const index = resistanceTypes.indexOf(type);
+                if (index >= 0 && index < inputs.length) {
+                    resistances[type] = parseFloat(inputs[index].value) || 1.0;
+                } else {
+                    resistances[type] = 1.0; // Default value
+                }
+            } else {
+                resistances[type] = 1.0; // Default value
+            }
+        }
+    });
+    
+    return resistances;
+}
+
+/**
+ * Set resistances field values
+ * @param {Object} resistancesData - Resistances object with values by type
+ */
+function setResistancesFieldValues(resistancesData) {
+    if (!resistancesData) return;
+    
+    const resistanceTypes = ['kinetic', 'energy', 'explosive', 'thermal'];
+    
+    resistanceTypes.forEach((type, index) => {
+        const input = document.querySelector(`.resistance-row .resistance-value[data-type="${type}"]`);
+        if (input && resistancesData[type] !== undefined) {
+            input.value = resistancesData[type];
+            // Trigger input event to update labels
+            input.dispatchEvent(new Event('input'));
+        } else {
+            // Try to find by traversing the DOM structure
+            const inputs = document.querySelectorAll('.resistance-value');
+            if (inputs.length > 0 && index < inputs.length && resistancesData[type] !== undefined) {
+                inputs[index].value = resistancesData[type];
+                // Trigger input event to update labels
+                inputs[index].dispatchEvent(new Event('input'));
+            }
+        }
+    });
+}
+
+/**
  * Create type-specific fields for a component type
  * @param {string} componentType - Component type
  * @param {HTMLElement} specificTabContent - Container for specific fields
@@ -297,6 +504,21 @@ function clearFormFields(componentType) {
                 
                 colorPreview.style.backgroundColor = `rgba(${r*255}, ${g*255}, ${b*255}, ${a})`;
             }
+        } else if (field.type === 'position') {
+            // Handle position fields
+            setPositionFieldValues(field.default || { x: 0, y: 0 });
+        } else if (field.type === 'resistances') {
+            // Handle resistances fields
+            setResistancesFieldValues(field.default || {
+                kinetic: 1.0,
+                energy: 1.0,
+                explosive: 1.0,
+                thermal: 1.0
+            });
+        } else if (field.type === 'collisionShape') {
+            // Handle collision shape
+            const shapeData = field.default || { type: 'rectangle', size: { x: 100, y: 100 } };
+            setCollisionShapeData(shapeData);
         } else if (field.type !== 'equipment') {
             // Handle regular fields
             const input = document.getElementById(field.id);
@@ -337,14 +559,20 @@ function collectFormData(type, id) {
     // Add specific fields
     const specificFields = fieldDefinitions[type].specific || [];
     specificFields.forEach(field => {
-        const input = document.getElementById(field.id);
-        if (input) {
-            if (field.type === 'checkbox') {
-                data[field.id] = input.checked;
-            } else if (field.type === 'number') {
-                data[field.id] = parseFloat(input.value);
-            } else {
-                data[field.id] = input.value;
+        if (field.type === 'position') {
+            data[field.id] = getPositionFieldValues(field.id);
+        } else if (field.type === 'color') {
+            data[field.id] = getColorFieldValues(field.id);
+        } else {
+            const input = document.getElementById(field.id);
+            if (input) {
+                if (field.type === 'checkbox') {
+                    data[field.id] = input.checked;
+                } else if (field.type === 'number') {
+                    data[field.id] = parseFloat(input.value);
+                } else {
+                    data[field.id] = input.value;
+                }
             }
         }
     });
@@ -360,6 +588,15 @@ function collectFormData(type, id) {
         if (field.type === 'color') {
             // Handle color fields
             data[field.id] = getColorFieldValues(field.id);
+        } else if (field.type === 'position') {
+            // Handle position fields
+            data[field.id] = getPositionFieldValues(field.id);
+        } else if (field.type === 'resistances') {
+            // Handle resistances
+            data[field.id] = getResistancesFieldValues();
+        } else if (field.type === 'collisionShape') {
+            // Handle collision shape
+            data[field.id] = getCollisionShapeData();
         } else {
             // Handle regular fields
             const input = document.getElementById(field.id);
@@ -382,15 +619,15 @@ function collectFormData(type, id) {
         
         // Rename specific fields based on weapon type
         if (weaponType === 'gun') {
-            const gunSpreadAngle = document.getElementById('gun_spread_angle');
+            const gunSpreadAngle = document.getElementById('spread_angle');
             if (gunSpreadAngle) {
                 data.spread_angle = parseFloat(gunSpreadAngle.value);
             }
         } else if (weaponType === 'turret') {
-            const rotationSpeed = document.getElementById('turret_rotation_speed');
-            const aimAheadFactor = document.getElementById('turret_aim_ahead_factor');
-            const fireArc = document.getElementById('turret_fire_arc');
-            const baseInaccuracy = document.getElementById('turret_base_inaccuracy');
+            const rotationSpeed = document.getElementById('rotation_speed');
+            const aimAheadFactor = document.getElementById('aim_ahead_factor');
+            const fireArc = document.getElementById('fire_arc');
+            const baseInaccuracy = document.getElementById('base_inaccuracy');
             
             if (rotationSpeed) data.rotation_speed = parseFloat(rotationSpeed.value);
             if (aimAheadFactor) data.aim_ahead_factor = parseFloat(aimAheadFactor.value);
@@ -402,7 +639,7 @@ function collectFormData(type, id) {
             const acceleration = document.getElementById('missile_acceleration');
             const maxSpeed = document.getElementById('missile_max_speed');
             const blastRadius = document.getElementById('missile_blast_radius');
-            const salvoSize = document.getElementById('missile_salvo_size');
+            const salvoSize = document.getElementById('salvo_size');
             
             if (trackingTime) data.missile_tracking_time = parseFloat(trackingTime.value);
             if (turningSpeed) data.missile_turning_speed = parseFloat(turningSpeed.value);
