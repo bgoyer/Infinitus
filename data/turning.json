@@ -1,35 +1,38 @@
-{
-  "small_turning": {
-    "name": "Small Turning",
-    "thrust": 3,
+"standard_turning": {
+    "type": "turning",
+    "name": "Standard Turning",
+    "equipment_name": "MK-1 Maneuvering Thrusters",
+    "description": "Standard turning thrusters providing adequate rotational control.",
+    "thrust": 4,
     "drain": 1,
     "capacitor_need": 1,
-    "description": "A small turning system with modest performance.",
-    "mass": 1,
-    "equipment_name": "Small Turning System",
-    "value": 100,
+    "mass": 50,
+    "value": 150,
     "volume": 5
   },
-  "standard_turning": {
-    "name": "Standard Turning",
-    "thrust": 5,
+  
+  "enhanced_turning": {
+    "type": "turning",
+    "name": "Enhanced Turning",
+    "equipment_name": "MK-2 Maneuvering Thrusters",
+    "description": "Upgraded turning thrusters for improved rotational speed and control.",
+    "thrust": 6,
     "drain": 1.5,
-    "capacitor_need": 2,
-    "description": "A balanced turning system for medium ships.",
-    "mass": 2,
-    "equipment_name": "Standard Turning System",
-    "value": 200,
-    "volume": 8
+    "capacitor_need": 1,
+    "mass": 60,
+    "value": 350,
+    "volume": 6
   },
-  "advanced_turning": {
-    "name": "Advanced Turning",
-    "thrust": 8,
-    "drain": 2,
-    "capacitor_need": 3,
-    "description": "A high-performance turning system for combat ships.",
-    "mass": 3,
-    "equipment_name": "Advanced Turning System",
-    "value": 400,
+  
+  "slow_turning": {
+    "type": "turning",
+    "name": "Slow Turning",
+    "equipment_name": "Freight-class Maneuvering Thrusters",
+    "description": "Heavy-duty turning thrusters designed for larger vessels.",
+    "thrust": 2,
+    "drain": 0.5,
+    "capacitor_need": 1,
+    "mass": 100,
+    "value": 200,
     "volume": 10
   }
-}

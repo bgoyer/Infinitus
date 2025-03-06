@@ -1,44 +1,69 @@
-{
-  "light_armor": {
+"light_armor": {
+    "type": "armor",
     "name": "Light Armor",
+    "equipment_name": "Light Hull Plating",
+    "description": "Basic armor plating offering minimal protection without compromising speed.",
     "armor_rating": 5,
     "damage_threshold": 3,
-    "max_absorption": 0.6,
-    "kinetic_resistance": 0.8,
-    "energy_resistance": 1.2,
-    "explosive_resistance": 1.5,
-    "thermal_resistance": 1.3,
-    "description": "Thin hull plating offering basic protection.",
-    "mass": 20,
-    "value": 150,
+    "max_absorption": 0.5,
+    "resistances": {
+      "kinetic": 0.8,
+      "energy": 1.2,
+      "explosive": 1.5,
+      "thermal": 1.0
+    },
+    "mass": 50,
+    "value": 100,
+    "volume": 5
+  },
+"medium_armor": {
+    "type": "armor",
+    "name": "Medium Armor",
+    "equipment_name": "Standard Hull Plating",
+    "description": "Standard armor plating offering a good balance of protection and weight.",
+    "armor_rating": 15,
+    "damage_threshold": 5,
+    "max_absorption": 0.65,
+    "resistances": {
+      "kinetic": 0.7,
+      "energy": 1.0,
+      "explosive": 1.2,
+      "thermal": 0.9
+    },
+    "mass": 100,
+    "value": 300,
     "volume": 10
   },
-  "standard_armor": {
-    "name": "Standard Armor",
-    "armor_rating": 10,
-    "damage_threshold": 5,
-    "max_absorption": 0.7,
-    "kinetic_resistance": 1.0,
-    "energy_resistance": 1.0,
-    "explosive_resistance": 1.0,
-    "thermal_resistance": 1.0,
-    "description": "Balanced armor plating with no particular strengths or weaknesses.",
-    "mass": 40,
-    "value": 300,
+  
+  "heavy_armor": {
+    "type": "armor",
+    "name": "Heavy Armor",
+    "equipment_name": "Reinforced Hull Plating",
+    "description": "Heavy-duty armor plating offering superior protection at the cost of weight.",
+    "armor_rating": 25,
+    "damage_threshold": 8,
+    "max_absorption": 0.8,
+    "resistances": {
+      "kinetic": 0.5,
+      "energy": 0.8,
+      "explosive": 0.9,
+      "thermal": 0.7
+    },
+    "mass": 200,
+    "value": 600,
     "volume": 20
   },
-  "ablative_armor": {
-    "name": "Ablative Armor",
-    "armor_rating": 8,
-    "damage_threshold": 4,
-    "max_absorption": 0.65,
-    "kinetic_resistance": 1.2,
-    "energy_resistance": 0.7,
-    "explosive_resistance": 1.0,
-    "thermal_resistance": 0.6,
-    "description": "Specialized armor that excels against kinetic weapons but weak against energy and heat.",
-    "mass": 30,
-    "value": 400,
-    "volume": 15
+  
+  "standard_capacitor": {
+    "type": "capacitor",
+    "name": "Standard Capacitor",
+    "equipment_name": "MK-1 Energy Capacitor",
+    "description": "Standard energy storage system for ship systems.",
+    "max_capacity": 100,
+    "discharge_efficiency": 1.0,
+    "recharge_efficiency": 1.0,
+    "discharge_rate_limit": 50.0,
+    "mass": 80,
+    "value": 200,
+    "volume": 8
   }
-}

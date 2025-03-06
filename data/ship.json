@@ -1,98 +1,222 @@
 {
   "fighter_basic": {
     "name": "Basic Fighter",
-    "description": "A lightweight combat vessel with good maneuverability but limited firepower.",
     "max_velocity": 1200,
-    "max_hull_health": 80,
+    "max_hull_health": 100,
     "faction": "neutral",
-    "scene_path": "res://Scenes/Ships/fighter_basic.tscn",
-    "equipment": {
-      "thruster": "small_thruster",
-      "turning": "small_turning",
-      "capacitor": "small_capacitor",
-      "generator": "basic_generator",
-      "shield": "light_shield",
-      "armor": "light_armor",
-      "weapons": [
-        {"id": "light_laser", "hardpoint": 1},
-        {"id": "light_laser", "hardpoint": 2}
-      ]
+    "sprite_texture": "res://assets/ships/fighter_basic.png",
+    "sprite_scale": 1.0,
+    "collision_shape": {
+      "type": "rectangle",
+      "size": {"x": 100, "y": 150}
     },
-    "mass": 200,
-    "value": 2000,
-    "volume": 100
-  },
-  "interceptor": {
-    "name": "Interceptor",
-    "description": "A fast attack vessel designed to engage targets quickly.",
-    "max_velocity": 1400,
-    "max_hull_health": 65,
-    "faction": "neutral",
-    "scene_path": "res://Scenes/Ships/interceptor.tscn",
-    "equipment": {
-      "thruster": "high_performance_thruster",
-      "turning": "agile_turning",
-      "capacitor": "standard_capacitor",
-      "generator": "standard_generator",
-      "shield": "light_shield",
-      "armor": "light_armor",
-      "weapons": [
-        {"id": "medium_laser", "hardpoint": 1}
-      ]
-    },
-    "mass": 180,
-    "value": 2500,
-    "volume": 90
-  },
-  "gunship": {
-    "name": "Gunship",
-    "description": "A medium combat vessel with enhanced weapons capability.",
-    "max_velocity": 950,
-    "max_hull_health": 120,
-    "faction": "neutral",
-    "scene_path": "res://Scenes/Ships/gunship.tscn",
+    "hardpoints": [
+      {
+        "id": 1,
+        "position": {"x": 0, "y": -50},
+        "weapon_id": "laser_basic"
+      },
+      {
+        "id": 2,
+        "position": {"x": -30, "y": -20}
+      },
+      {
+        "id": 3,
+        "position": {"x": 30, "y": -20}
+      }
+    ],
+    "engine_points": [
+      {
+        "id": 1,
+        "position": {"x": -20, "y": 60},
+        "particles": true
+      },
+      {
+        "id": 2,
+        "position": {"x": 20, "y": 60},
+        "particles": true
+      }
+    ],
     "equipment": {
       "thruster": "standard_thruster",
       "turning": "standard_turning",
-      "capacitor": "military_capacitor",
-      "generator": "high_output_generator",
-      "shield": "standard_shield",
-      "armor": "standard_armor",
-      "weapons": [
-        {"id": "medium_laser", "hardpoint": 1},
-        {"id": "medium_laser", "hardpoint": 2},
-        {"id": "auto_turret", "hardpoint": 3},
-        {"id": "missile_launcher", "hardpoint": 4}
-      ]
+      "shield": "basic_shield",
+      "armor": "light_armor",
+      "capacitor": "standard_capacitor",
+      "generator": "standard_generator"
     },
-    "mass": 300,
-    "value": 4000,
-    "volume": 150
+    "health_component": true,
+    "energy_component": true,
+    "max_energy": 100,
+    "energy_recharge_rate": 10,
+    "shield_max": 50,
+    "shield_recharge_rate": 5,
+    "armor_value": 5,
+    "tracked": true,
+    "indicator_name": "Fighter",
+    "indicator_color": {"r": 0.2, "g": 0.6, "b": 1.0, "a": 1.0}
   },
-  "cruiser": {
-    "name": "Cruiser",
-    "description": "A heavy combat vessel with balanced offensive and defensive capabilities.",
+  
+  "sparrow": {
+    "name": "Sparrow",
+    "max_velocity": 1500,
+    "max_hull_health": 80,
+    "faction": "pirate",
+    "sprite_texture": "res://assets/ships/sparrow.png",
+    "sprite_scale": 0.8,
+    "collision_shape": {
+      "type": "circle",
+      "radius": 40
+    },
+    "hardpoints": [
+      {
+        "id": 1,
+        "position": {"x": 0, "y": -45},
+        "weapon_id": "rapid_blaster"
+      }
+    ],
+    "engine_points": [
+      {
+        "id": 1,
+        "position": {"x": 0, "y": 50},
+        "particles": true
+      }
+    ],
+    "equipment": {
+      "thruster": "enhanced_thruster",
+      "turning": "enhanced_turning",
+      "shield": "light_shield",
+      "capacitor": "light_capacitor",
+      "generator": "efficient_generator"
+    },
+    "health_component": true,
+    "energy_component": true,
+    "max_energy": 70,
+    "energy_recharge_rate": 12,
+    "shield_max": 30,
+    "shield_recharge_rate": 6,
+    "tracked": true,
+    "indicator_name": "Sparrow",
+    "indicator_color": {"r": 1.0, "g": 0.3, "b": 0.3, "a": 1.0}
+  },
+  
+  "police_cruiser": {
+    "name": "Police Cruiser",
+    "max_velocity": 900,
+    "max_hull_health": 150,
+    "faction": "police",
+    "sprite_texture": "res://assets/ships/police_cruiser.png",
+    "sprite_scale": 1.0,
+    "collision_shape": {
+      "type": "rectangle",
+      "size": {"x": 120, "y": 200}
+    },
+    "hardpoints": [
+      {
+        "id": 1,
+        "position": {"x": -40, "y": -80},
+        "weapon_id": "police_blaster"
+      },
+      {
+        "id": 2,
+        "position": {"x": 40, "y": -80},
+        "weapon_id": "police_blaster"
+      },
+      {
+        "id": 3,
+        "position": {"x": 0, "y": 20},
+        "weapon_id": "turret_medium"
+      }
+    ],
+    "engine_points": [
+      {
+        "id": 1,
+        "position": {"x": -30, "y": 90},
+        "particles": true
+      },
+      {
+        "id": 2,
+        "position": {"x": 30, "y": 90},
+        "particles": true
+      }
+    ],
+    "equipment": {
+      "thruster": "heavy_thruster",
+      "turning": "standard_turning",
+      "shield": "police_shield",
+      "armor": "medium_armor",
+      "capacitor": "large_capacitor",
+      "generator": "police_generator"
+    },
+    "health_component": true,
+    "energy_component": true,
+    "max_energy": 150,
+    "energy_recharge_rate": 15,
+    "shield_max": 100,
+    "shield_recharge_rate": 8,
+    "armor_value": 15,
+    "tracked": true,
+    "indicator_name": "Police Cruiser",
+    "indicator_color": {"r": 0.2, "g": 0.3, "b": 1.0, "a": 1.0}
+  },
+  
+  "trader_freighter": {
+    "name": "Trade Freighter",
     "max_velocity": 700,
     "max_hull_health": 200,
-    "faction": "neutral",
-    "scene_path": "res://Scenes/Ships/cruiser.tscn",
-    "equipment": {
-      "thruster": "standard_thruster",
-      "turning": "standard_turning",
-      "capacitor": "military_capacitor",
-      "generator": "high_output_generator",
-      "shield": "heavy_shield",
-      "armor": "heavy_armor",
-      "weapons": [
-        {"id": "heavy_cannon", "hardpoint": 1},
-        {"id": "heavy_cannon", "hardpoint": 2},
-        {"id": "auto_turret", "hardpoint": 3},
-        {"id": "auto_turret", "hardpoint": 4},
-        {"id": "missile_launcher", "hardpoint": 5}
-      ]
+    "faction": "trader",
+    "sprite_texture": "res://assets/ships/trader_freighter.png",
+    "sprite_scale": 1.2,
+    "collision_shape": {
+      "type": "rectangle",
+      "size": {"x": 150, "y": 250}
     },
-    "mass": 500,
-    "value": 7500,
-    "volume": 250
+    "hardpoints": [
+      {
+        "id": 1,
+        "position": {"x": -60, "y": -100},
+        "weapon_id": "defensive_turret"
+      },
+      {
+        "id": 2,
+        "position": {"x": 60, "y": -100},
+        "weapon_id": "defensive_turret"
+      }
+    ],
+    "engine_points": [
+      {
+        "id": 1,
+        "position": {"x": -40, "y": 120},
+        "particles": true
+      },
+      {
+        "id": 2,
+        "position": {"x": 0, "y": 120},
+        "particles": true
+      },
+      {
+        "id": 3,
+        "position": {"x": 40, "y": 120},
+        "particles": true
+      }
+    ],
+    "equipment": {
+      "thruster": "cargo_thruster",
+      "turning": "slow_turning",
+      "shield": "trader_shield",
+      "armor": "heavy_armor",
+      "capacitor": "large_capacitor",
+      "generator": "trade_generator"
+    },
+    "health_component": true,
+    "energy_component": true,
+    "max_energy": 120,
+    "energy_recharge_rate": 10,
+    "shield_max": 80,
+    "shield_recharge_rate": 5,
+    "armor_value": 20,
+    "tracked": true,
+    "indicator_name": "Freighter",
+    "indicator_color": {"r": 0.2, "g": 0.8, "b": 0.3, "a": 1.0}
   }
 }
